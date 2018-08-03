@@ -1,5 +1,104 @@
 #include <iostream>
+#include <vector>
 #include <math.h> // pow()
+
+
+static const unsigned int AMOUNT_OF_PARAMETERS = 2;
+static const unsigned int AMOUNT_OF_VARIANTS = pow(2, AMOUNT_OF_PARAMETERS);
+
+
+struct Tuple {
+// Examples of tuples: x0x3x4, x0x2, x1, ...
+// Xs are zero-based
+    private:
+        // [i] == true => xi present
+        bool xs[AMOUNT_OF_VARIANTS];
+
+    public:
+        Tuple(long long number) {
+            // TODO
+            // Check all AMOUNT_OF_PARAMETERS
+        }
+
+        bool& operator[](unsigned int i) {
+            return xs[i];
+        }
+
+        const bool& operator[](unsigned int i) const {
+            return xs[i];
+        }
+};
+
+
+struct Argument {
+// Examples of Arguments: (x0)(!x1)(!x2)(x3), (x0)(x1)(x2)(x3), ...
+// Xs are zero-based
+    private:
+        // [i] == true => xi not inverted
+        bool xs[AMOUNT_OF_VARIANTS];
+
+    public:
+        Argument(long long number) {
+            // TODO
+            // Check all AMOUNT_OF_PARAMETERS
+        }
+
+        bool& operator[](unsigned int i) {
+            return xs[i];
+        }
+
+        const bool& operator[](unsigned int i) const {
+            return xs[i];
+        }
+};
+
+
+// start - zero-based
+std::vector<long long> getPermutationsFrom(const Argument& argument, unsigned int start) {
+    const bool x_inverted = !argument[start];
+    const long long x_present     = 1 << start;
+    const long long x_not_present = 0;
+    //     inverted => (x ^ 1) => generates 2 tuples
+    // not inverted => (x)     => generates 1 tuple
+
+    if (start == AMOUNT_OF_PARAMETERS - 1) { // the last one
+        if (x_inverted) {
+            return {x_present, x_not_present};
+        } else {
+            return {x_present};
+        }
+    }
+
+    std::vector<long long> tuples;
+    const auto tail = getPermutationsFrom(argument, start + 1);
+
+    // With xi present
+    for (const long long& tuple : tail) {
+        tuples.push_back(x_present | tuple);
+    }
+    // With xi not present (xi == 1)
+    if (x_inverted) {
+        for (const long long& tuple : tail) {
+            tuples.push_back(x_not_present | tuple);
+        }
+    }
+
+    return tuples;
+}
+
+
+// (!x) === (x ^ 1)
+void generateTuples(std::vector<Tuple>& result, const Argument& argument) {
+    const std::vector<long long> tuples = getPermutationsFrom(argument, 0);
+    for (const long long& tuple : tuples) {
+        result.emplace_back(tuple);
+    }
+}
+
+
+
+
+
 
 long long convertDecToBin (unsigned int number) {
     long long binNumber = 0;
@@ -16,8 +115,6 @@ long long convertDecToBin (unsigned int number) {
 }
 
 int main() {
-    const unsigned int AMOUNT_OF_PARAMETERS = 2;
-    const unsigned int AMOUNT_OF_VARIANTS = pow(2, AMOUNT_OF_PARAMETERS);
     // filling of the function table
     unsigned int table[AMOUNT_OF_VARIANTS] = {0, 1, 1, 0};
 
