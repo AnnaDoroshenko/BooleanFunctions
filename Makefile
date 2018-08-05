@@ -6,7 +6,7 @@ classFiles =
 justHeaderFiles =
 # Compilation flags
 OPTIMIZATION_FLAG = -O0
-COMPILER_GLAGS = -Wall
+COMPILER_GLAGS = -Wall -Wextra -Wno-unused-parameter
 LINKER_FLAGS =
 
 
