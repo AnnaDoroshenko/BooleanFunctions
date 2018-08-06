@@ -10,25 +10,27 @@ static const unsigned int AMOUNT_OF_VARIANTS = 1 << AMOUNT_OF_PARAMETERS;
 struct Function {
     private:
         // bool overflow;
-        char elements[AMOUNT_OF_VARIANTS];
+        std::vector<unsigned int> elements;
 
     public:
         Function() {
-            memset(elements, 0, sizeof(char) * AMOUNT_OF_VARIANTS);
+            for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+                elements.push_back(0);
+            }
         }
 
-        Function (unsigned int function) {
-            for (int i = AMOUNT_OF_VARIANTS - 1; i >= 0; i--) {
-                elements[i] = function % 10;
+        Function (long long function) {
+            for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
+                elements.push_back(function % 10);
                 function /= 10;
             }
         }
 
-        char& operator[](unsigned int index) {
+        unsigned int& operator[](unsigned int index) {
             return elements[index];
         }
 
-        const char& operator[](unsigned int index) const {
+        unsigned int& operator[](unsigned int index) const {
             return elements[index];
         }
 };
@@ -56,6 +58,10 @@ struct LinearFunction {
             }
         }
 
+        unsigned int getSize() {
+            return elements.size();
+        }
+
         unsigned int& operator[](unsigned int index) {
             return elements[index];
         }
@@ -66,28 +72,14 @@ struct LinearFunction {
 };
 
 
-long long convertDecToBin (unsigned int number) {
-    long long binNumber = 0;
-    int weight = 1;
-
-    while (number != 0) {
-        unsigned int bit = number % 2;
-        number /= 2;
-        binNumber += bit * weight;
-        weight *= 10;
-    }
-
-    return binNumber;
-}
-
-
 // Method for generation of the Truth Table
-void generateTruthTable (unsigned int amountOfVariants, std::vector<long long>& truthTable) {
+void generateTruthTable (const unsigned int amountOfVariants, std::vector<long long>& truthTable) {
     for (unsigned int i = 0; i < amountOfVariants; i++) {
-
+        truthTable[i] = i;
     }
-
 }
+
+
 // Method for generation of the array of linear functions
 void getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
     for (unsigned int i = 0; i < (AMOUNT_OF_VARIANTS * 2); i++){
@@ -96,11 +88,39 @@ void getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
 }
 
 
+void getLambdaFunction (const std::vector<long long>& truthTable, LinearFunction linearFunction, std::vector<unsigned int>& lambdaFunction) {
+    for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
+        unsigned int currentResult = 0;
+        unsigned int j = 0;
+        if (linearFunction[0] == AMOUNT_OF_PARAMETERS) {
+            currentResult = 1;
+            j++;
+        }
+        for ( ; j < linearFunction.getSize(); j++) {
+            if ((truthTable[i] >> (AMOUNT_OF_PARAMETERS - 1 - linearFunction[j])) & 1) {
+                currentResult ^= currentResult;
+            }
+        }
+        lambdaFunction[i] = currentResult;
+    }
+}
 unsigned int getNonlinearityOfFunction (Function function) {
 
 }
 
 int main() {
+
+    std::vector<LinearFunction> array;
+    getArrayOfLinearFunctions(array);
+    long long number = 0;
+    for(unsigned int i = 0; i < array.size(); i++) {
+        LinearFunction linFunc(i);
+        for (unsigned int j = 0; j < linFunc.getSize(); j++) {
+            std::cout << linFunc[j]; 
+        }
+        std::cout << std::endl;
+        number++;
+    }
 
     return 0;
 } 
