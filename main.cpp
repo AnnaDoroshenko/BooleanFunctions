@@ -19,12 +19,11 @@ struct Function {
             }
         }
 
-        // TODO: change to the 0b... format
-        // Supposing to do this by shifts
-        Function (long long function) {
+        // Function is represented in the binary format of a number
+        Function (unsigned int function) {
             for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
-                elements.push_back(function % 10);
-                function /= 10;
+                unsigned int currentBit = function >> (AMOUNT_OF_VARIANTS - 1 - i);
+                elements.push_back(currentBit & 1);
             }
         }
 
@@ -120,8 +119,22 @@ void getArrayOfLambdaFunctions (const std::vector<long long>& truthTable, const 
 }
 
 
-unsigned int getNonlinearityOfFunction (Function function) {
+unsigned int getNonlinearityOfFunction (const Function& function, const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
+    unsigned int nonlinearity = 4294967295; // max value 0f unsigned int data type
+    for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
+        unsigned int currentNonlinearity = 0;
+        const std::vector<unsigned int>& currentLambdaFunction = arrayOfLambdaFunctions[i];
+        for (unsigned int j = 0; j < currentLambdaFunction.size(); j++) {
+            if (function[j] != currentLambdaFunction[j]) {
+                currentNonlinearity++;
+            }
+        }
+        if (currentNonlinearity < nonlinearity) {
+            nonlinearity = currentNonlinearity;
+        }
+    }
 
+    return nonlinearity;
 }
 
 
@@ -138,22 +151,9 @@ int main() {
 
     getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
 
-    for (unsigned int i = 0; i < (AMOUNT_OF_VARIANTS * 2 - 2); i++) {
-        std::vector<unsigned int>& currentLambdaFunc = arrayOfLambdaFunc[i];
-        for (unsigned int k = 0; k < currentLambdaFunc.size(); k++) {
-            /* std::cout << "here3" << std::endl; */
-            std::cout << currentLambdaFunc[k];
-        }
-        std::cout << std::endl;
-    }
-
-    /* for(unsigned int i = 0; i < array.size(); i++) { */
-    /*     const LinearFunction& linFunc = array[i]; */
-    /*     for (unsigned int j = 0; j < linFunc.size(); j++) { */
-    /*         std::cout << linFunc[j];  */
-    /*     } */
-    /*     std::cout << std::endl; */
-    /* } */
+    Function testFunc(0b11000101);
+    unsigned int res = getNonlinearityOfFunction(testFunc, arrayOfLambdaFunc);
+    std::cout << res << std::endl;
 
     return 0;
 } 
