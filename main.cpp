@@ -1,6 +1,6 @@
-#include <iostream>
-#include <cstring>
-#include <vector>
+#include <iostream> // std::cout;
+#include <vector> // std::vector
+#include <limits> // std::numeric_limits
 
 
 static const unsigned int AMOUNT_OF_PARAMETERS = 3;
@@ -112,7 +112,7 @@ void getArrayOfLambdaFunctions (const std::vector<long long>& truthTable, const 
     arrayOfLambdaFunctions.reserve(AMOUNT_OF_VARIANTS * 2 - 2);
     for (unsigned int i = 0; i < (AMOUNT_OF_VARIANTS * 2 - 2); i++) {
         std::vector<unsigned int> currentLambdaFunction;
-        currentLambdaFunction.reserve(AMOUNT_OF_VARIANTS); // ???????
+        currentLambdaFunction.reserve(AMOUNT_OF_VARIANTS);
         getLambdaFunction(truthTable, arrayOfLinearFunctions[i], currentLambdaFunction);
         arrayOfLambdaFunctions.push_back(currentLambdaFunction);
     }
@@ -120,8 +120,8 @@ void getArrayOfLambdaFunctions (const std::vector<long long>& truthTable, const 
 
 
 unsigned int getNonlinearityOfFunction (const Function& function, const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
-    unsigned int nonlinearity = 4294967295; // max value 0f unsigned int data type
-    for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
+    unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
+        for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
         unsigned int currentNonlinearity = 0;
         const std::vector<unsigned int>& currentLambdaFunction = arrayOfLambdaFunctions[i];
         for (unsigned int j = 0; j < currentLambdaFunction.size(); j++) {
