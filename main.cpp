@@ -19,6 +19,8 @@ struct Function {
             }
         }
 
+        // TODO: change to the 0b... format
+        // Supposing to do this by shifts
         Function (long long function) {
             for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
                 elements.push_back(function % 10);
@@ -30,7 +32,7 @@ struct Function {
             return elements[index];
         }
 
-        unsigned int& operator[](unsigned int index) const {
+        const unsigned int& operator[](unsigned int index) const {
             return elements[index];
         }
 };
@@ -42,14 +44,10 @@ struct LinearFunction {
         std::vector<unsigned int> elements;
 
     public:
-        LinearFunction() {
-            for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
-                elements.push_back(0);
-            }
-        }
+        LinearFunction() {}
 
         LinearFunction (long long number) {
-            // Extra one loop is added to include "1" as element of linear equation
+            // Extra one iteration is added to include "1" as element of linear equation
             for (unsigned int i = 0; i <= AMOUNT_OF_PARAMETERS; i++) {
                 if ((number & 1) == 1) {
                     elements.push_back(AMOUNT_OF_PARAMETERS - i);
@@ -58,7 +56,7 @@ struct LinearFunction {
             }
         }
 
-        unsigned int getSize() {
+        const unsigned int size() {
             return elements.size();
         }
 
@@ -96,7 +94,7 @@ void getLambdaFunction (const std::vector<long long>& truthTable, LinearFunction
             currentResult = 1;
             j++;
         }
-        for ( ; j < linearFunction.getSize(); j++) {
+        for ( ; j < linearFunction.size(); j++) {
             if ((truthTable[i] >> (AMOUNT_OF_PARAMETERS - 1 - linearFunction[j])) & 1) {
                 currentResult ^= currentResult;
             }
@@ -115,7 +113,7 @@ int main() {
     long long number = 0;
     for(unsigned int i = 0; i < array.size(); i++) {
         LinearFunction linFunc(i);
-        for (unsigned int j = 0; j < linFunc.getSize(); j++) {
+        for (unsigned int j = 0; j < linFunc.size(); j++) {
             std::cout << linFunc[j]; 
         }
         std::cout << std::endl;
