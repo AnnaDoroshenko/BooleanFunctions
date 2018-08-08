@@ -5,6 +5,7 @@
 
 static const unsigned int AMOUNT_OF_PARAMETERS = 3;
 static const unsigned int AMOUNT_OF_VARIANTS = 1 << AMOUNT_OF_PARAMETERS; 
+static const unsigned int AMOUNT_OF_LAMBDA_FUNCTIONS = AMOUNT_OF_VARIANTS * 2 - 2;
 
 
 struct Function {
@@ -80,10 +81,11 @@ void generateTruthTable (std::vector<long long>& truthTable) {
 
 // Method for generation of the array of linear functions
 void getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
-    array.reserve(AMOUNT_OF_VARIANTS * 2);
-    // Starts with i = 2, because functions f = 0 ==> [!x(n),..!x(1),!x(0),!1]
+    array.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
+    // Starts with i = 2, because i is used for generation of linear functions
+    // and functions f = 0 ==> [!x(n),..!x(1),!x(0),!1]
     // and f = 1 ==> [!x(n),..!x(1),!x(0),1] are not included 
-    for (unsigned int i = 2; i < (AMOUNT_OF_VARIANTS * 2); i++){
+    for (unsigned int i = 2; i < (AMOUNT_OF_LAMBDA_FUNCTIONS + 2); i++){
         array.push_back(LinearFunction(i));
     }
 }
@@ -109,8 +111,8 @@ void getLambdaFunction (const std::vector<long long>& truthTable, const LinearFu
 
 
 void getArrayOfLambdaFunctions (const std::vector<long long>& truthTable, const std::vector<LinearFunction>& arrayOfLinearFunctions, std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
-    arrayOfLambdaFunctions.reserve(AMOUNT_OF_VARIANTS * 2 - 2);
-    for (unsigned int i = 0; i < (AMOUNT_OF_VARIANTS * 2 - 2); i++) {
+    arrayOfLambdaFunctions.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
+    for (unsigned int i = 0; i < AMOUNT_OF_LAMBDA_FUNCTIONS; i++) {
         std::vector<unsigned int> currentLambdaFunction;
         currentLambdaFunction.reserve(AMOUNT_OF_VARIANTS);
         getLambdaFunction(truthTable, arrayOfLinearFunctions[i], currentLambdaFunction);
@@ -147,7 +149,7 @@ int main() {
     getArrayOfLinearFunctions(arrayOfLinFunc);
 
     std::vector<std::vector<unsigned int>> arrayOfLambdaFunc;
-    arrayOfLambdaFunc.reserve(AMOUNT_OF_VARIANTS * 2 - 2);
+    arrayOfLambdaFunc.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
 
     getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
 
