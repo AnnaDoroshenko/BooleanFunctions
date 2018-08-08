@@ -1,31 +1,31 @@
 #include <iostream> // std::cout;
 #include <vector> // std::vector
+#include <string> // std::string
 #include <limits> // std::numeric_limits
 
 
 static const unsigned int AMOUNT_OF_PARAMETERS = 3;
-static const unsigned int AMOUNT_OF_VARIANTS = 1 << AMOUNT_OF_PARAMETERS; 
+static const unsigned int AMOUNT_OF_VARIANTS = 1 << AMOUNT_OF_PARAMETERS;
 static const unsigned int AMOUNT_OF_LAMBDA_FUNCTIONS = AMOUNT_OF_VARIANTS * 2 - 2;
 
 
-struct Function {
+struct InputFunction {
     private:
         // bool overflow;
         std::vector<unsigned int> elements;
 
     public:
-        Function() {
+        InputFunction() {
             for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
                 elements.push_back(0);
             }
         }
 
-        // Function is represented in the binary format of a number
-        // TODO: format should be changed for big function
-        Function (unsigned int function) {
+        // Function is represented in the string format
+        InputFunction (std::string input) {
             for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
-                const unsigned int currentBit = function >> (AMOUNT_OF_VARIANTS - 1 - i);
-                elements.push_back(currentBit & 1);
+                const unsigned int currentBit = input.at(i) - '0';
+                elements.push_back(currentBit);
             }
         }
 
@@ -42,7 +42,7 @@ struct Function {
 // Linear function format is x(n),..x(1),x(0),1
 struct LinearFunction {
     private:
-        std::vector<unsigned int> elements;
+        std::vector<unsigned int> indices;
 
     public:
         LinearFunction() {}
@@ -51,22 +51,22 @@ struct LinearFunction {
             // Extra one iteration is added to include "1" as element of linear equation
             for (unsigned int i = 0; i <= AMOUNT_OF_PARAMETERS; i++) {
                 if ((number & 1) == 1) {
-                    elements.push_back(AMOUNT_OF_PARAMETERS - i);
+                    indices.push_back(AMOUNT_OF_PARAMETERS - i);
                 }
                 number >>= 1;
             }
         }
 
         unsigned int size() const{
-            return elements.size();
+            return indices.size();
         }
 
         unsigned int& operator[](unsigned int index) {
-            return elements[index];
+            return indices[index];
         }
 
         const unsigned int& operator[](unsigned int index) const {
-            return elements[index];
+            return indices[index];
         }
 };
 
@@ -122,7 +122,7 @@ void getArrayOfLambdaFunctions (const std::vector<long long>& truthTable, const 
 }
 
 
-unsigned int getNonlinearityOfFunction (const Function& function, const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
+unsigned int getMinDistance (const InputFunction& function, const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
         for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
         unsigned int currentNonlinearity = 0;
@@ -141,8 +141,7 @@ unsigned int getNonlinearityOfFunction (const Function& function, const std::vec
 }
 
 
-int main() {
-
+unsigned int calculateNonlinearityOfFunction(InputFunction& input) {
     std::vector<long long> truthTable;
     generateTruthTable(truthTable);
 
@@ -154,9 +153,13 @@ int main() {
 
     getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
 
-    Function testFunc(0b11000101);
-    unsigned int res = getNonlinearityOfFunction(testFunc, arrayOfLambdaFunc);
-    std::cout << res << std::endl;
+    return getMinDistance(input,arrayOfLambdaFunc);
+}
+
+
+int main() {
+    InputFunction test("11000101");
+    std::cout << calculateNonlinearityOfFunction(test) << std::endl;
 
     return 0;
 } 
