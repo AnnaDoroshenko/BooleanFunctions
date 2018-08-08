@@ -21,9 +21,10 @@ struct Function {
         }
 
         // Function is represented in the binary format of a number
+        // TODO: format should be changed for big function
         Function (unsigned int function) {
             for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
-                unsigned int currentBit = function >> (AMOUNT_OF_VARIANTS - 1 - i);
+                const unsigned int currentBit = function >> (AMOUNT_OF_VARIANTS - 1 - i);
                 elements.push_back(currentBit & 1);
             }
         }
