@@ -1,6 +1,31 @@
 #include "Function.h"
 
 
+// Linear function format is x(n),..x(1),x(0),1
+LinearFunction::LinearFunction() {};
+LinearFunction::LinearFunction(long long number) {
+    // Extra one iteration is added to include "1" as element of linear equation
+    for (unsigned int i = 0; i <= AMOUNT_OF_PARAMETERS; i++) {
+        if ((number & 1) == 1) {
+            indices.push_back(AMOUNT_OF_PARAMETERS - i);
+        }
+        number >>= 1;
+    }
+};
+
+unsigned int LinearFunction::size() const {
+    return indices.size();
+}
+
+unsigned int& LinearFunction::operator[](unsigned int index) {
+    return indices[index];
+}
+
+const unsigned int& LinearFunction::operator[](unsigned int index) const {
+    return indices[index];
+}
+
+
 Function::Function(std::string input) : 
     AMOUNT_OF_PARAMETERS(log2(input.size())),
     AMOUNT_OF_VARIANTS(input.size()),
@@ -22,31 +47,6 @@ unsigned int& Function::operator[](unsigned int index) {
 
 const unsigned int& Function::operator[](unsigned int index) const {
     return arguments[index];
-}
-
-
-// Linear function format is x(n),..x(1),x(0),1
-Function::LinearFunction::LinearFunction() {};
-Function::LinearFunction::LinearFunction(long long number) {
-    // Extra one iteration is added to include "1" as element of linear equation
-    for (unsigned int i = 0; i <= AMOUNT_OF_PARAMETERS; i++) {
-        if ((number & 1) == 1) {
-            indices.push_back(AMOUNT_OF_PARAMETERS - i);
-        }
-        number >>= 1;
-    }
-};
-
-unsigned int Function::LinearFunction::size() const {
-    return indices.size();
-}
-
-unsigned int& Function::LinearFunction::operator[](unsigned int index) {
-    return indices[index];
-}
-
-const unsigned int& Function::LinearFunction::operator[](unsigned int index) const {
-    return indices[index];
 }
 
 
