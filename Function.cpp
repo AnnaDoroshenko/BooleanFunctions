@@ -1,31 +1,6 @@
 #include "Function.h"
 
 
-// Linear function format is x(n),..x(1),x(0),1
-LinearFunction::LinearFunction() {};
-LinearFunction::LinearFunction(long long number) {
-    // Extra one iteration is added to include "1" as element of linear equation
-    for (unsigned int i = 0; i <= AMOUNT_OF_PARAMETERS; i++) {
-        if ((number & 1) == 1) {
-            indices.push_back(AMOUNT_OF_PARAMETERS - i);
-        }
-        number >>= 1;
-    }
-};
-
-unsigned int LinearFunction::size() const {
-    return indices.size();
-}
-
-unsigned int& LinearFunction::operator[](unsigned int index) {
-    return indices[index];
-}
-
-const unsigned int& LinearFunction::operator[](unsigned int index) const {
-    return indices[index];
-}
-
-
 Function::Function(std::string input) : 
     AMOUNT_OF_PARAMETERS(log2(input.size())),
     AMOUNT_OF_VARIANTS(input.size()),
@@ -33,7 +8,7 @@ Function::Function(std::string input) :
         unsigned int s = input.size();
         while ((s & 1) == 0) s >>= 1;
         if ((s >> 1) != 0) {
-            throw std::invalid_argument("Check amount of arguments of the function");
+            throw std::invalid_argument("Invalid amount of function arguments passed. Terminating");
         }
         for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
             const unsigned int currentArgument = input.at(i) - '0';
@@ -59,6 +34,32 @@ void Function::generateTruthTable (std::vector<long long>& truthTable) {
 }
 
 
+// Linear function format is x(n),..x(1),x(0),1
+Function::LinearFunction::LinearFunction() {};
+Function::LinearFunction::LinearFunction(long long number) {
+    unsigned int index = 0;
+    while (number != 0) {
+        if ((number & 1) == 1) {
+            indices.push_back(index);
+        }
+        number >>= 1;
+        index++;
+    }
+};
+
+unsigned int Function::LinearFunction::size() const {
+    return indices.size();
+}
+
+unsigned int& Function::LinearFunction::operator[](unsigned int index) {
+    return indices[index];
+}
+
+const unsigned int& Function::LinearFunction::operator[](unsigned int index) const {
+    return indices[index];
+}
+
+
 // Method for generation of the array of linear functions
 void Function::getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
     array.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
@@ -79,12 +80,12 @@ void Function::getLambdaFunction (
     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
         unsigned int currentResult = 0;
         unsigned int j = 0;
-        if (linearFunction[0] == AMOUNT_OF_PARAMETERS) {
+        if (linearFunction[0] == 0) {
             currentResult = 1;
             j++;
         }
         for ( ; j < linearFunction.size(); j++) {
-            if ((truthTable[i] >> (AMOUNT_OF_PARAMETERS - 1 - linearFunction[j])) & 1) {
+            if ((truthTable[i] >> (linearFunction[j] - 1)) & 1) {
                 currentResult ^= 1;
             }
         }
@@ -107,6 +108,8 @@ void Function::getArrayOfLambdaFunctions (
 }
 
 
+// Method for calculation of the Hamming distance between the input function
+// and each of lambda functions and finding min of them
 unsigned int Function::getMinDistance (
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
