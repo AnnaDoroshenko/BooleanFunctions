@@ -25,7 +25,7 @@ const unsigned int& Function::operator[](unsigned int index) const {
 }
 
 
-// Method for generation of the Truth Table
+// Generation of the Truth Table
 void Function::generateTruthTable (std::vector<long long>& truthTable) {
     truthTable.reserve(AMOUNT_OF_VARIANTS);
     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
@@ -34,7 +34,7 @@ void Function::generateTruthTable (std::vector<long long>& truthTable) {
 }
 
 
-// Linear function format is x(n),..x(1),x(0),1
+// Linear function format is x(0),x(1),..x(n) [1,x(0),x(1),..x(n)]
 Function::LinearFunction::LinearFunction() {};
 Function::LinearFunction::LinearFunction(long long number) {
     unsigned int index = 0;
@@ -60,12 +60,12 @@ const unsigned int& Function::LinearFunction::operator[](unsigned int index) con
 }
 
 
-// Method for generation of the array of linear functions
+// Generation of the array of linear functions
 void Function::getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
     array.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
     // Starts with i = 2, because i is used for generation of linear functions
-    // and functions f = 0 ==> [!x(n),..!x(1),!x(0),!1]
-    // and f = 1 ==> [!x(n),..!x(1),!x(0),1] are not included 
+    // and functions f = 0 ==> [!1,!x(0),!x(1),..!x(n)]
+    // and f = 1 ==> [1,!x(0),!x(1),..!x(n)] are not included 
     for (unsigned int i = 2; i < (AMOUNT_OF_LAMBDA_FUNCTIONS + 2); i++){
         array.push_back(LinearFunction(i));
     }
