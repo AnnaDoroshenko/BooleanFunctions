@@ -7,6 +7,7 @@
 #include <string> // std::string
 #include <limits> // std::numeric_limits
 #include <math.h> // log2
+#include <bitset> // std::bitset<numberOfBits>
 
 
 class Function {
@@ -49,6 +50,27 @@ class Function {
             std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
     unsigned int getMinDistance (
             const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
+
+
+    struct Tuple {
+        private:
+            std::vector<long long> elements;
+
+        public:
+            Tuple(); 
+            Tuple(long long number1, long long number2);
+            long long& operator[](unsigned int index);
+            const long long& operator[](unsigned int index) const;
+    };
+
+
+    std::vector<std::vector<long long>> getBaseNumbers();
+    std::vector<Tuple> getTuples (
+            const unsigned int& index, 
+            const std::vector<long long>& baseNumbers);
+
+    public:
+    std::vector<std::vector<Tuple>> getArrayOfTuples ();
 };
 
 

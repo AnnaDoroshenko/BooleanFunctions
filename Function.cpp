@@ -144,3 +144,82 @@ unsigned int Function::calculateNonlinearity() {
 
     return getMinDistance(arrayOfLambdaFunc);
 }
+
+
+// Format of a tuple is {number1, number2}
+// numbers differ by one bit (for example, {100, 101})
+Function::Tuple::Tuple() {
+    elements = {0, 0};
+}
+
+Function::Tuple::Tuple(long long number1, long long number2) {
+    elements.push_back(number1);
+    elements.push_back(number2);
+}
+
+long long& Function::Tuple::operator[](unsigned int index) {
+    return elements[index];
+}
+
+const long long& Function::Tuple::operator[](unsigned int index) const {
+    return elements[index];
+}
+
+
+// Base number is a number, from which we get inverted number by one exact x.
+// Base number and inverted number form tuple.
+// For example, 000 - base number, 001 - number inverted by x2
+std::vector<std::vector<long long>> Function::getBaseNumbers() {
+    std::vector<std::vector<long long>> vectorOfBaseNumbers;
+    vectorOfBaseNumbers.reserve(AMOUNT_OF_PARAMETERS);
+    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+        std::vector<long long> currentVectorOfBaseNumbers;
+        currentVectorOfBaseNumbers.reserve(AMOUNT_OF_VARIANTS / 2);
+        // step is used for jumping by base numbers' intervals
+        unsigned int step = 0;
+        // how many parts we have the same
+        for (int j = 0; j < (1 << i); j++) {
+            // workind with these parts
+            for (unsigned int k = 0; k < (AMOUNT_OF_VARIANTS / (1 << (i + 1))); k++) {
+                currentVectorOfBaseNumbers.push_back(step);
+                step++;
+            }
+            step = (AMOUNT_OF_VARIANTS / (1 << i)) * (j + 1);
+        }
+        vectorOfBaseNumbers.push_back(currentVectorOfBaseNumbers);
+    }
+    
+    return vectorOfBaseNumbers;
+}
+
+
+std::vector<Function::Tuple> Function::getTuples (
+        const unsigned int& index, 
+        const std::vector<long long>& baseNumbers) {
+    std::vector<Tuple> tuples;
+    tuples.reserve(AMOUNT_OF_VARIANTS / 2);
+    const long long DIFFERENCE = 1 << index;
+    for (unsigned int i = 0; i < (AMOUNT_OF_VARIANTS / 2); i++) {
+        const long long number = baseNumbers[i];
+        Tuple currentTuple(number, (number ^ DIFFERENCE));
+        tuples.push_back(currentTuple);
+        // For output of tuples in bit format uncomment next line
+        /* std::cout << "{" << std::bitset<AMOUNT_OF_PARAMETERS>(currentTuple[0]) << ", " << std::bitset<AMOUNT_OF_PARAMETERS>(currentTuple[1]) << "}" << std::endl; */
+        // For output of tuples in integer format uncomment next line
+        std::cout << "{" << currentTuple[0] << ", " << currentTuple[1] << "}" << std::endl;
+    }
+
+    return tuples;
+}
+
+
+std::vector<std::vector<Function::Tuple>> Function::getArrayOfTuples () {
+    std::vector<std::vector<Tuple>> arrayOfTuples;
+    arrayOfTuples.reserve(AMOUNT_OF_PARAMETERS);
+    std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers();
+    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+        arrayOfTuples[i] = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]);
+    }
+
+    return arrayOfTuples;
+}
