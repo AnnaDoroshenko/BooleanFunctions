@@ -108,8 +108,8 @@ void Function::getArrayOfLambdaFunctions (
 }
 
 
-// Method for calculation of the Hamming distance between the input function
-// and each of lambda functions and finding min of them
+// Calculation of the Hamming distances between the input function
+// and each of lambda functions. Then finding min distance
 unsigned int Function::getMinDistance (
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
@@ -206,20 +206,42 @@ std::vector<Function::Tuple> Function::getTuples (
         // For output of tuples in bit format uncomment next line
         /* std::cout << "{" << std::bitset<AMOUNT_OF_PARAMETERS>(currentTuple[0]) << ", " << std::bitset<AMOUNT_OF_PARAMETERS>(currentTuple[1]) << "}" << std::endl; */
         // For output of tuples in integer format uncomment next line
-        std::cout << "{" << currentTuple[0] << ", " << currentTuple[1] << "}" << std::endl;
+        /* std::cout << "{" << currentTuple[0] << ", " << currentTuple[1] << "}" << std::endl; */
     }
 
     return tuples;
 }
 
 
-std::vector<std::vector<Function::Tuple>> Function::getArrayOfTuples () {
-    std::vector<std::vector<Tuple>> arrayOfTuples;
+void Function::getArrayOfTuples (
+        std::vector<std::vector<Function::Tuple>>& arrayOfTuples) {
     arrayOfTuples.reserve(AMOUNT_OF_PARAMETERS);
     std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers();
     for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
         arrayOfTuples[i] = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]);
     }
+}
 
-    return arrayOfTuples;
+
+void Function::getStatistics (
+        const Function& function, 
+        std::vector<double>& statisticArray) {
+    statisticArray.reserve(AMOUNT_OF_PARAMETERS);
+    std::vector<std::vector<Tuple>> arrayOfTuples;
+    getArrayOfTuples(arrayOfTuples);
+    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+        unsigned int count = 0;
+        const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i];
+        for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) {
+            const Tuple& currentTuple = currentVectorOfArrayOfTuples[j];
+            if (function[currentTuple[0]] != function[currentTuple[1]]) {
+                count++;
+            }
+            std::cout << function[currentTuple[0]] << ";" << function[currentTuple[1]] <<std::endl;
+        }
+        std::cout << "count = " << count << std::endl;
+        std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl;
+        std::cout << std::endl;
+        statisticArray[i] = static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2);
+    }
 }

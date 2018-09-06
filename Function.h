@@ -68,9 +68,10 @@ class Function {
     std::vector<Tuple> getTuples (
             const unsigned int& index, 
             const std::vector<long long>& baseNumbers);
+    void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples);
 
     public:
-    std::vector<std::vector<Tuple>> getArrayOfTuples ();
+    void getStatistics (const Function& function, std::vector<double>& statisticArray);
 };
 
 
