@@ -218,14 +218,14 @@ void Function::getArrayOfTuples (
     arrayOfTuples.reserve(AMOUNT_OF_PARAMETERS);
     std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers();
     for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
-        arrayOfTuples[i] = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]);
+        std::vector<Tuple> currentArrayOfTuples = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]);
+        arrayOfTuples.push_back(currentArrayOfTuples);
     }
 }
 
 
-void Function::getStatistics (
-        const Function& function, 
-        std::vector<double>& statisticArray) {
+std::vector<double> Function::getStatistics () {
+    std::vector<double> statisticArray;
     statisticArray.reserve(AMOUNT_OF_PARAMETERS);
     std::vector<std::vector<Tuple>> arrayOfTuples;
     getArrayOfTuples(arrayOfTuples);
@@ -234,14 +234,17 @@ void Function::getStatistics (
         const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i];
         for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) {
             const Tuple& currentTuple = currentVectorOfArrayOfTuples[j];
-            if (function[currentTuple[0]] != function[currentTuple[1]]) {
+            if (arguments[currentTuple[0]] != arguments[currentTuple[1]]) {
                 count++;
             }
-            std::cout << function[currentTuple[0]] << ";" << function[currentTuple[1]] <<std::endl;
+            /* std::cout << arguments[currentTuple[0]] << ";" << arguments[currentTuple[1]] <<std::endl; */
         }
-        std::cout << "count = " << count << std::endl;
-        std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl;
-        std::cout << std::endl;
+        // To see key values of calculation uncomment next three lines
+        /* std::cout << "count = " << count << std::endl; */
+        /* std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl; */
+        /* std::cout << std::endl; */
         statisticArray[i] = static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2);
     }
+
+    return statisticArray;
 }

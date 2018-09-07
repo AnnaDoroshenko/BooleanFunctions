@@ -71,7 +71,7 @@ class Function {
     void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples);
 
     public:
-    void getStatistics (const Function& function, std::vector<double>& statisticArray);
+    std::vector<double> getStatistics ();
 };
 
 
