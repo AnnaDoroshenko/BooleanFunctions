@@ -110,21 +110,36 @@ void Function::getArrayOfLambdaFunctions (
 
 // Calculation of the Hamming distances between the input function
 // and each of lambda functions. Then finding min distance
+// TODO: get not int, but vector<int>
 unsigned int Function::getMinDistance (
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
+    const unsigned int COUNT = arrayOfLambdaFunctions.size();
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
-        for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
-        unsigned int currentNonlinearity = 0;
-        const std::vector<unsigned int>& currentLambdaFunction = arrayOfLambdaFunctions[i];
-        for (unsigned int j = 0; j < currentLambdaFunction.size(); j++) {
-            if (arguments[j] != currentLambdaFunction[j]) {
-                currentNonlinearity++;
+    std::vector<unsigned int> distances;
+    distances.reserve(COUNT);
+    for (unsigned int i = 0; i < COUNT; i++) {
+        const unsigned int currentNonlinearity = [&](){
+            const std::vector<unsigned int>& currentLambdaFunction = arrayOfLambdaFunctions[i];
+            unsigned int currentNonlinearity = 0;
+            for (unsigned int j = 0; j < currentLambdaFunction.size(); j++) {
+                if (arguments[j] != currentLambdaFunction[j]) {
+                    currentNonlinearity++;
+                }
             }
-        }
+
+            return currentNonlinearity;
+        }();
+        distances.push_back(currentNonlinearity);
         if (currentNonlinearity < nonlinearity) {
             nonlinearity = currentNonlinearity;
         }
     }
+    for (unsigned int i = 0; i < COUNT; i++) {
+       if (distances[i] == nonlinearity) {
+           // add to new array of LambdaFunc with min nonlinearity
+       } 
+    }
+    // get LinFunc from LambdaFunc ??? Do not how to do it
 
     return nonlinearity;
 }
