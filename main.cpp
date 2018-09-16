@@ -17,7 +17,7 @@ int main() {
     std::vector<double> testStat = testFunction.getStatistics();
 
     for (unsigned int i = 0; i < 4; i++) {
-        std::cout << i << " => " << testStat[i]  << std::endl;
+        std::cout << "x" << i << " => " << testStat[i]  << std::endl;
     }
 
     return 0;

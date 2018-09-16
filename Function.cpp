@@ -113,7 +113,7 @@ void Function::getArrayOfLambdaFunctions (
 unsigned int Function::getMinDistance (
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
-        for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
+    for (unsigned int i = 0; i < arrayOfLambdaFunctions.size(); i++) {
         unsigned int currentNonlinearity = 0;
         const std::vector<unsigned int>& currentLambdaFunction = arrayOfLambdaFunctions[i];
         for (unsigned int j = 0; j < currentLambdaFunction.size(); j++) {
