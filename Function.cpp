@@ -109,8 +109,8 @@ void Function::getArrayOfLambdaFunctions (
 
 
 // Calculation of the Hamming distances between the input function
-// and each of lambda functions. Then finding min distance
-// TODO: get not int, but vector<int>
+// and each of lambda functions. Then finding min distance.
+// Also the closest linear functions can be shown
 unsigned int Function::getMinDistance (
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     const unsigned int COUNT = arrayOfLambdaFunctions.size();
@@ -134,9 +134,16 @@ unsigned int Function::getMinDistance (
             nonlinearity = currentNonlinearity;
         }
     }
+    std::vector<std::vector<unsigned int>> arrayOfLambdaFuncWithMinDistance;
     for (unsigned int i = 0; i < COUNT; i++) {
        if (distances[i] == nonlinearity) {
-           // add to new array of LambdaFunc with min nonlinearity
+           arrayOfLambdaFuncWithMinDistance.push_back(arrayOfLambdaFunctions[i]);
+           // For showing lambda function(-s) uncomment next lines
+           /* const std::vector<unsigned int>& currentLFunc = arrayOfLambdaFunctions[i]; */
+           /* for (unsigned int j = 0; j < currentLFunc.size(); j++) { */
+           /*     std::cout << currentLFunc[j]; */
+           /* } */
+           /* std::cout << std::endl; */
        } 
     }
     // get LinFunc from LambdaFunc ??? Do not how to do it
