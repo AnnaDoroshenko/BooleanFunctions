@@ -139,11 +139,11 @@ unsigned int Function::getMinDistance (
        if (distances[i] == nonlinearity) {
            arrayOfLambdaFuncWithMinDistance.push_back(arrayOfLambdaFunctions[i]);
            // For showing lambda function(-s) uncomment next lines
-           /* const std::vector<unsigned int>& currentLFunc = arrayOfLambdaFunctions[i]; */
-           /* for (unsigned int j = 0; j < currentLFunc.size(); j++) { */
-           /*     std::cout << currentLFunc[j]; */
-           /* } */
-           /* std::cout << std::endl; */
+           const std::vector<unsigned int>& currentLFunc = arrayOfLambdaFunctions[i];
+           for (unsigned int j = 0; j < currentLFunc.size(); j++) {
+               std::cout << currentLFunc[j];
+           }
+           std::cout << std::endl;
        } 
     }
     // get LinFunc from LambdaFunc ??? Do not how to do it

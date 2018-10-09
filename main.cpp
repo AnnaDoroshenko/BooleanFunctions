@@ -5,7 +5,7 @@
 
 int main() {
 
-    Function testFunction("1101100001011010");
+    Function testFunction("11011000");
 
     try {
         std::cout << "Nonlinearity = ";
@@ -16,7 +16,7 @@ int main() {
 
     std::vector<double> testStat = testFunction.getStatistics();
 
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         std::cout << "x" << i << " => " << testStat[i]  << std::endl;
     }
 
