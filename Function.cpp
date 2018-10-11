@@ -112,6 +112,7 @@ void Function::getArrayOfLambdaFunctions (
 // and each of lambda functions. Then finding min distance.
 // Also the closest linear functions can be shown
 unsigned int Function::getMinDistance (
+        const std::vector<long long>& truthTable,
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     const unsigned int COUNT = arrayOfLambdaFunctions.size();
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
@@ -144,9 +145,9 @@ unsigned int Function::getMinDistance (
                std::cout << currentLFunc[j];
            }
            std::cout << std::endl;
+           getLinearFunction(truthTable, currentLFunc);
        } 
     }
-    // get LinFunc from LambdaFunc ??? Do not how to do it
 
     return nonlinearity;
 }
@@ -164,7 +165,7 @@ unsigned int Function::calculateNonlinearity() {
 
     getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
 
-    return getMinDistance(arrayOfLambdaFunc);
+    return getMinDistance(truthTable, arrayOfLambdaFunc);
 }
 
 
@@ -269,4 +270,79 @@ std::vector<double> Function::getStatistics () {
     }
 
     return statisticArray;
+}
+
+
+// method for finding linear function from lamda function
+Function::Brace::Brace(unsigned int arg, bool isInverted) : elem(arg, isInverted) {}
+
+
+Function::Brace::Brace() : Brace(0, false) {}
+
+
+unsigned int Function::Brace::index() {
+    return elem.first;
+}
+
+
+bool Function::Brace::inverted() {
+    return elem.second;
+}
+
+
+void Function::getLinearFunction(
+        const std::vector<long long>& truthTable, 
+        const std::vector<unsigned int>& currentLamdaFunc) {
+    using Argument = std::vector<Brace>;
+    bool presenceTable[AMOUNT_OF_VARIANTS];
+    for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
+           std::cout << "here1" << std::endl;
+        if (currentLamdaFunc[i] == 1) {
+            long long row = truthTable[i];
+            Argument currentArg;
+            currentArg.reserve(AMOUNT_OF_PARAMETERS);
+            for (int j = (AMOUNT_OF_PARAMETERS - 1); j >= 0; j--) {
+           std::cout << "here2" << std::endl;
+                unsigned int bit = (row >> j) & 1;
+                currentArg.push_back(Brace((j - AMOUNT_OF_PARAMETERS + 1), (bit == 0)));
+            }
+            // processing of currentArg
+            for (long long combination = 0; combination < AMOUNT_OF_VARIANTS; combination++) {
+           std::cout << "here3" << std::endl;
+                std::vector<unsigned int> arguments;
+                for (unsigned int b = 0; b < AMOUNT_OF_PARAMETERS; b++) {
+           std::cout << "here4" << std::endl;
+                    unsigned int currentBraceBit = (combination >> (AMOUNT_OF_PARAMETERS - 1 - b)) & 1;
+                    if (currentBraceBit == 0) {
+                        arguments.push_back(currentArg[b].index());
+                    } else if (currentArg[b].inverted()) {
+                        break;
+                    }
+                }
+                long long currentIndex = 0;
+                unsigned int currentElem = 0;
+                for (unsigned int k = 0; k < AMOUNT_OF_PARAMETERS; k++) {
+                    currentIndex <<= 1;
+                    if (arguments[AMOUNT_OF_PARAMETERS - 1 - k] == currentElem) {
+                        currentIndex++;
+                    }
+                    currentElem++;
+                }
+           std::cout << "here5" << std::endl;
+                presenceTable[currentElem] = !presenceTable[currentElem];
+            }
+        }
+    }
+    // analize presenceTable and show the result
+    bool notFirst = false;
+    for (unsigned int index = 0; index < AMOUNT_OF_VARIANTS; index++) {
+        if (presenceTable[index]) {
+            if (notFirst) {
+                std::cout << " + " << std::endl;
+            } else {
+                notFirst = true;
+            }
+            std::cout << "x" << index << std::endl;
+        }
+    }
 }

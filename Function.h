@@ -49,6 +49,7 @@ class Function {
             const std::vector<LinearFunction>& arrayOfLinearFunctions, 
             std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
     unsigned int getMinDistance (
+            const std::vector<long long>& trurhTable,
             const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
 
 
@@ -72,6 +73,23 @@ class Function {
 
     public:
     std::vector<double> getStatistics ();
+
+
+    struct Brace {
+        private:
+            std::pair<unsigned int, bool> elem;
+
+        public:
+            Brace();
+            Brace(unsigned int arg, bool isInverted);
+            unsigned int index();
+            bool inverted();
+    };
+
+
+    void getLinearFunction(
+            const std::vector<long long>& truthTable, 
+            const std::vector<unsigned int>& currentLamdaFunc);
 };
 
 
