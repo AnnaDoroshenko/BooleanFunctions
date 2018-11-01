@@ -294,42 +294,71 @@ void Function::getLinearFunction(
         const std::vector<long long>& truthTable, 
         const std::vector<unsigned int>& currentLamdaFunc) {
     using Argument = std::vector<Brace>;
+
+
+    std::cout << "Current lambda function: ";
+    for (unsigned int t = 0; t < currentLamdaFunc.size(); t++) {
+        std::cout << currentLamdaFunc[t];
+    }
+    std::cout << std::endl;
+
+
     bool presenceTable[AMOUNT_OF_VARIANTS];
     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
-           std::cout << "here1" << std::endl;
         if (currentLamdaFunc[i] == 1) {
             long long row = truthTable[i];
+
+
+            std::cout << std::endl;
+            std::cout << "Current row " << i << " = " << std::bitset<8>(row) << std::endl;
+
+
             Argument currentArg;
             currentArg.reserve(AMOUNT_OF_PARAMETERS);
             for (int j = (AMOUNT_OF_PARAMETERS - 1); j >= 0; j--) {
-           std::cout << "here2" << std::endl;
                 unsigned int bit = (row >> j) & 1;
-                currentArg.push_back(Brace((j - AMOUNT_OF_PARAMETERS + 1), (bit == 0)));
+                currentArg.push_back(Brace((AMOUNT_OF_PARAMETERS - 1 - j), (bit == 0)));
+
+
+                std::cout << "Brace: {" << (AMOUNT_OF_PARAMETERS - 1 - j) << "; " << std::boolalpha << (bit == 0) << "}" << std::endl;
             }
+
+
             // processing of currentArg
             for (long long combination = 0; combination < AMOUNT_OF_VARIANTS; combination++) {
-           std::cout << "here3" << std::endl;
+                std::cout << "combination " << combination << ": ";
                 std::vector<unsigned int> arguments;
                 for (unsigned int b = 0; b < AMOUNT_OF_PARAMETERS; b++) {
-           std::cout << "here4" << std::endl;
                     unsigned int currentBraceBit = (combination >> (AMOUNT_OF_PARAMETERS - 1 - b)) & 1;
                     if (currentBraceBit == 0) {
                         arguments.push_back(currentArg[b].index());
                     } else if (currentArg[b].inverted()) {
-                        break;
+                        continue;
                     }
+
+
+                    std::cout << arguments[b] << "; ";
+
+
                 }
+                std::cout << std::endl;
+
+
                 long long currentIndex = 0;
-                unsigned int currentElem = 0;
-                for (unsigned int k = 0; k < AMOUNT_OF_PARAMETERS; k++) {
-                    currentIndex <<= 1;
-                    if (arguments[AMOUNT_OF_PARAMETERS - 1 - k] == currentElem) {
-                        currentIndex++;
-                    }
-                    currentElem++;
+                unsigned int size = arguments.size();
+                for (unsigned int k = 0; k < size ; k++) {
+                    currentIndex += (1 << arguments[size - 1 - i]);
                 }
-           std::cout << "here5" << std::endl;
-                presenceTable[currentElem] = !presenceTable[currentElem];
+                /* long long currentIndex = 0; */
+                /* unsigned int currentElem = 0; */
+                /* for (unsigned int k = 0; k < AMOUNT_OF_PARAMETERS; k++) { */
+                /*     currentIndex <<= 1; */
+                /*     if (arguments.at(AMOUNT_OF_PARAMETERS - 1 - k) == currentElem) { */
+                /*         currentIndex++; */
+                /*     } */
+                /*     currentElem++; */
+                /* } */
+                presenceTable[currentIndex] = !presenceTable[currentIndex];
             }
         }
     }
