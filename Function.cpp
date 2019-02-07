@@ -5,11 +5,31 @@ Function::Function(std::string input) :
     AMOUNT_OF_PARAMETERS(log2(input.size())),
     AMOUNT_OF_VARIANTS(input.size()),
     AMOUNT_OF_LAMBDA_FUNCTIONS(AMOUNT_OF_VARIANTS * 2 - 2) {
+        std::cout << "--------------------------------------" << std::endl;
+        std::cout << "Input: " << input << std::endl;
+        std::cout << "--------------------------------------" << std::endl;
+
         unsigned int s = input.size();
         while ((s & 1) == 0) s >>= 1;
         if ((s >> 1) != 0) {
             throw std::invalid_argument("Invalid amount of function arguments passed. Terminating");
         }
+
+        unsigned int countOnes = 0;
+        unsigned int countZeros = 0;
+        for (unsigned int bit = 0; bit < input.size(); bit++) {
+            if (input[bit] == '1') {
+                countOnes++;
+            } else {
+                countZeros++;
+            }
+        }
+        if (countOnes != countZeros) {
+            std::cout << "countOnes = " << countOnes << std::endl;
+            std::cout << "countZeros = " << countZeros << std::endl;
+            throw std::invalid_argument("Input function is not balanced. Terminating");
+        }
+
         for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
             const unsigned int currentArgument = input.at(i) - '0';
             arguments.push_back(currentArgument);
@@ -108,10 +128,128 @@ void Function::getArrayOfLambdaFunctions (
 }
 
 
+// Calculates Hamming distance between the input functions
+// (and Truth Table representation of linear function can be printed)
+// Be careful about input: [x(0), x(1), .. x(n), 1]
+// For example, f=x3 => 0...00100, so function expects 4
+unsigned int Function::calculateH(
+        std::vector<unsigned int>& indeces) {
+    unsigned int decForm = 0;
+    for (unsigned int index : indeces) {
+        decForm += 1 << (AMOUNT_OF_PARAMETERS - index);
+    }
+    LinearFunction linearFunction = LinearFunction(decForm);
+    std::vector<long long> truthTable;
+    generateTruthTable(truthTable);
+    std::vector<unsigned int> lambdaFunction;
+    lambdaFunction.reserve(AMOUNT_OF_VARIANTS);
+    getLambdaFunction(truthTable, linearFunction, lambdaFunction);
+
+    // For Truth Table representation uncomment next loop
+    /* for (unsigned int i = 0; i < lambdaFunction.size(); i++) { */
+    /*     std::cout << lambdaFunction[i]; */
+    /* } */
+    /* std::cout << std::endl; */
+
+    unsigned int nonlinearity = 0;
+    for (unsigned int j = 0; j < lambdaFunction.size(); j++) {
+        if (arguments[j] != lambdaFunction[j]) {
+            nonlinearity++;
+        }
+    }
+    if (nonlinearity > (AMOUNT_OF_VARIANTS / 2)) {
+        nonlinearity = AMOUNT_OF_VARIANTS - nonlinearity;
+    }
+    /* std::cout << " H = " << nonlinearity; */
+
+    return nonlinearity;
+}
+
+void Function::calculateMinH(
+        std::vector<std::pair<unsigned int, double>>& sortedStats) {
+    std::vector<unsigned int> sorted;
+    sorted.reserve(AMOUNT_OF_PARAMETERS);
+    for (std::pair<unsigned int, double> stat : sortedStats) {
+        sorted.push_back(stat.first);
+    }
+    std::cout << "sorted = [ ";
+    for (unsigned int s : sorted) {
+        std::cout << "x" << s << " ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "======================================" << std::endl;
+
+    std::vector<std::vector<unsigned int>> selected;
+    selected.push_back({sorted[0]});
+    unsigned int selectedSize = 1;
+    std::cout << "k = 0, m = " << selectedSize;
+    for (std::vector<unsigned int> sel : selected) {
+        std::cout << " l0 = ";
+        for (unsigned int s : sel) {
+            std::cout << "x" << s << " ";
+        }
+        std::cout << std::endl;
+    }
+    for(unsigned int k = 1; k < AMOUNT_OF_PARAMETERS; k++) {
+        std::cout << "--------------------------------------" << std::endl;
+        std::cout << "k = " << k << std::endl;
+        for (unsigned int h = 0, a = 0; h < (selectedSize - a); h++) {
+            std::cout << "--------------------------------------" << std::endl;
+            std::cout << "h = " << h << " a = " << a << std::endl;
+            unsigned int h1 = calculateH(selected[h]);
+            std::vector<unsigned int> sel = selected[h];
+            sel.push_back(sorted[k]);
+            /* for (unsigned int s: sel) { */
+            /*     std::cout << s << std::endl; */
+            /* } */
+            unsigned int h2 = calculateH(sel);
+            std::cout << "H ( ";
+            for (unsigned int s : selected[h]) {
+                std::cout << "x" << s << " ";
+            }
+            std::cout << ") = " << h1 << std::endl;
+            std::cout << "H ( ";
+            for (unsigned int s : sel) {
+                std::cout << "x" << s << " ";
+            }
+            std::cout << ") = " << h2 << std::endl;
+            if (h2 <= h1) {
+                selected[h] = std::move(sel);
+            } else if (!alreadyAdded(selected, sorted[k])) {
+                selected.push_back({sorted[k]});
+                selectedSize++;
+                a++;
+            }
+            for (unsigned int i = 0; i < selected.size(); i++) {
+                std::cout << "l" << i << " = ";
+                for (unsigned int s : selected[i]) {
+                    std::cout << "x" << s << " ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << "m = " << selectedSize << std::endl;
+        }
+    }
+    
+    /* return sorted; */
+}
+
+
+bool Function::alreadyAdded(
+        std::vector<std::vector<unsigned int>>& selected, unsigned int& test) {
+    for (std::vector<unsigned int> sel : selected) {
+        if ((sel.size() == 1) && (sel[0] == test)) { return true; }
+    }
+
+    return false;
+}
+
+
 // Calculation of the Hamming distances between the input function
 // and each of lambda functions. Then finding min distance.
 // Also the closest linear functions can be shown
-unsigned int Function::getMinDistance (
+/* unsigned int Function::getMinDistance ( */
+void Function::getMinDistance (
         const std::vector<long long>& truthTable,
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     const unsigned int COUNT = arrayOfLambdaFunctions.size();
@@ -135,6 +273,9 @@ unsigned int Function::getMinDistance (
             nonlinearity = currentNonlinearity;
         }
     }
+    std::cout << "Nonlinearity = " << nonlinearity << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+
     std::vector<std::vector<unsigned int>> arrayOfLambdaFuncWithMinDistance;
     for (unsigned int i = 0; i < COUNT; i++) {
        if (distances[i] == nonlinearity) {
@@ -149,11 +290,12 @@ unsigned int Function::getMinDistance (
        } 
     }
 
-    return nonlinearity;
+    /* return nonlinearity; */
 }
 
 
-unsigned int Function::calculateNonlinearity() {
+/* unsigned int Function::calculateNonlinearity() { */
+void Function::calculateNonlinearity() {
     std::vector<long long> truthTable;
     generateTruthTable(truthTable);
 
@@ -165,7 +307,8 @@ unsigned int Function::calculateNonlinearity() {
 
     getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
 
-    return getMinDistance(truthTable, arrayOfLambdaFunc);
+    /* return getMinDistance(truthTable, arrayOfLambdaFunc); */
+    getMinDistance(truthTable, arrayOfLambdaFunc);
 }
 
 
@@ -247,7 +390,7 @@ void Function::getArrayOfTuples (
 }
 
 
-std::vector<double> Function::getStatistics () {
+std::vector<double> Function::getStatistics() {
     std::vector<double> statisticArray;
     statisticArray.reserve(AMOUNT_OF_PARAMETERS);
     std::vector<std::vector<Tuple>> arrayOfTuples;
@@ -266,8 +409,40 @@ std::vector<double> Function::getStatistics () {
         /* std::cout << "count = " << count << std::endl; */
         /* std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl; */
         /* std::cout << std::endl; */
-        statisticArray[i] = static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2);
+        statisticArray.push_back(static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2));
+        std::cout << "x" << i << " => " << statisticArray[i] << std::endl;
     }
+    std::cout << "--------------------------------------" << std::endl;
+
+    return statisticArray;
+}
+
+
+std::vector<std::pair<unsigned int, double>> Function::getSortedStatistics() {
+    using Interest = std::pair<unsigned int, double>;
+    std::vector<Interest> statisticArray;
+    statisticArray.reserve(AMOUNT_OF_PARAMETERS);
+    std::vector<std::vector<Tuple>> arrayOfTuples;
+    getArrayOfTuples(arrayOfTuples);
+    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+        unsigned int count = 0;
+        const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i];
+        for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) {
+            const Tuple& currentTuple = currentVectorOfArrayOfTuples[j];
+            if (arguments[currentTuple[0]] != arguments[currentTuple[1]]) {
+                count++;
+            }
+        }
+        statisticArray.push_back(Interest(i, static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2)));
+    }
+    std::sort(statisticArray.begin(), statisticArray.end(), [](const Interest &left, const Interest &right) {
+            return right.second < left.second;
+            });
+
+    for (Interest stat : statisticArray) {
+        std::cout << "x" << stat.first << " = " << stat.second << std::endl;
+    }
+    std::cout << "--------------------------------------" << std::endl;
 
     return statisticArray;
 }
@@ -359,4 +534,5 @@ void Function::getLinearFunction(
         }
     }
     std::cout << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
 }

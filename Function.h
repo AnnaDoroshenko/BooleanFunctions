@@ -8,6 +8,7 @@
 #include <limits> // std::numeric_limits
 #include <math.h> // log2
 #include <bitset> // std::bitset<numberOfBits>
+#include <algorithm> // std::sort
 
 
 class Function {
@@ -18,11 +19,15 @@ class Function {
 
     public:
     Function(std::string input);
-    unsigned int calculateNonlinearity();
+    /* unsigned int calculateNonlinearity(); */
+    void calculateNonlinearity();
+    unsigned int calculateH(std::vector<unsigned int>& indeces);
+    void calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
 
     private:
     unsigned int& operator[](unsigned int index);
     const unsigned int& operator[](unsigned int index) const;
+    bool alreadyAdded(std::vector<std::vector<unsigned int>>& selected, unsigned int& test);
 
 
     struct LinearFunction {
@@ -48,7 +53,10 @@ class Function {
             const std::vector<long long>& truthTable, 
             const std::vector<LinearFunction>& arrayOfLinearFunctions, 
             std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
-    unsigned int getMinDistance (
+    /* unsigned int getMinDistance ( */
+    /*         const std::vector<long long>& trurhTable, */
+    /*         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions); */
+    void getMinDistance (
             const std::vector<long long>& trurhTable,
             const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
 
@@ -73,6 +81,7 @@ class Function {
 
     public:
     std::vector<double> getStatistics ();
+    std::vector<std::pair<unsigned int, double>> getSortedStatistics();
 
 
     struct Brace {
