@@ -9,6 +9,8 @@
 #include <math.h> // log2
 #include <bitset> // std::bitset<numberOfBits>
 #include <algorithm> // std::sort
+#include <ctime> //std::time
+#include <cstdlib> // std::rand
 
 
 class Function {
@@ -18,11 +20,12 @@ class Function {
     std::vector<unsigned int> arguments;
 
     public:
+    Function();
     Function(std::string input);
     /* unsigned int calculateNonlinearity(); */
     void calculateNonlinearity();
     unsigned int calculateH(std::vector<unsigned int>& indeces);
-    void calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
+    unsigned int calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
 
     private:
     unsigned int& operator[](unsigned int index);
@@ -82,6 +85,7 @@ class Function {
     public:
     std::vector<double> getStatistics ();
     std::vector<std::pair<unsigned int, double>> getSortedStatistics();
+    std::string generateNonlinearFunc(unsigned int n);
 
 
     struct Brace {

@@ -1,6 +1,12 @@
 #include "Function.h"
 
 
+Function::Function() :
+    AMOUNT_OF_PARAMETERS(0),
+    AMOUNT_OF_VARIANTS(0),
+    AMOUNT_OF_LAMBDA_FUNCTIONS(0) {}
+
+
 Function::Function(std::string input) : 
     AMOUNT_OF_PARAMETERS(log2(input.size())),
     AMOUNT_OF_VARIANTS(input.size()),
@@ -160,15 +166,17 @@ unsigned int Function::calculateH(
     if (nonlinearity > (AMOUNT_OF_VARIANTS / 2)) {
         nonlinearity = AMOUNT_OF_VARIANTS - nonlinearity;
     }
-    /* std::cout << " H = " << nonlinearity; */
+    /* std::cout << " H = " << nonlinearity << std::endl; */
 
     return nonlinearity;
 }
 
-void Function::calculateMinH(
+unsigned int Function::calculateMinH(
         std::vector<std::pair<unsigned int, double>>& sortedStats) {
     std::vector<unsigned int> sorted;
+    std::vector<unsigned int> distances;
     sorted.reserve(AMOUNT_OF_PARAMETERS);
+    distances.reserve(AMOUNT_OF_PARAMETERS);
     for (std::pair<unsigned int, double> stat : sortedStats) {
         sorted.push_back(stat.first);
     }
@@ -181,56 +189,79 @@ void Function::calculateMinH(
 
     std::vector<std::vector<unsigned int>> selected;
     selected.push_back({sorted[0]});
+    unsigned int minH = calculateH(selected[0]);
+    distances.push_back(minH);
     unsigned int selectedSize = 1;
-    std::cout << "k = 0, m = " << selectedSize;
-    for (std::vector<unsigned int> sel : selected) {
-        std::cout << " l0 = ";
-        for (unsigned int s : sel) {
-            std::cout << "x" << s << " ";
-        }
-        std::cout << std::endl;
-    }
-    for(unsigned int k = 1; k < AMOUNT_OF_PARAMETERS; k++) {
-        std::cout << "--------------------------------------" << std::endl;
-        std::cout << "k = " << k << std::endl;
+    /* std::cout << "k = 0, m = " << selectedSize; */
+    /* for (std::vector<unsigned int> sel : selected) { */
+    /*     std::cout << " l0 = "; */
+    /*     for (unsigned int s : sel) { */
+    /*         std::cout << "x" << s << " "; */
+    /*     } */
+    /*     std::cout << std::endl; */
+    /* } */
+    unsigned int passes = 1;
+    for(unsigned int k = 1; k < sortedStats.size(); k++) {
+        /* std::cout << "--------------------------------------" << std::endl; */
+        /* std::cout << "k = " << k << std::endl; */
         for (unsigned int h = 0, a = 0; h < (selectedSize - a); h++) {
-            std::cout << "--------------------------------------" << std::endl;
-            std::cout << "h = " << h << " a = " << a << std::endl;
-            unsigned int h1 = calculateH(selected[h]);
+            /* std::cout << "--------------------------------------" << std::endl; */
+            /* std::cout << "h = " << h << " a = " << a << std::endl; */
+            /* unsigned int h1 = calculateH(selected[h]); */
+            unsigned int h1 = distances.at(h);
+            if (h1 < minH) {
+                minH = h1;
+            }
             std::vector<unsigned int> sel = selected[h];
             sel.push_back(sorted[k]);
             /* for (unsigned int s: sel) { */
             /*     std::cout << s << std::endl; */
             /* } */
             unsigned int h2 = calculateH(sel);
-            std::cout << "H ( ";
-            for (unsigned int s : selected[h]) {
-                std::cout << "x" << s << " ";
+            if (h2 < minH) {
+                minH = h2;
             }
-            std::cout << ") = " << h1 << std::endl;
-            std::cout << "H ( ";
-            for (unsigned int s : sel) {
-                std::cout << "x" << s << " ";
-            }
-            std::cout << ") = " << h2 << std::endl;
+            /* std::cout << "H ( "; */
+            /* for (unsigned int s : selected[h]) { */
+            /*     std::cout << "x" << s << " "; */
+            /* } */
+            /* std::cout << ") = " << h1 << std::endl; */
+            /* std::cout << "H ( "; */
+            /* for (unsigned int s : sel) { */
+            /*     std::cout << "x" << s << " "; */
+            /* } */
+            /* std::cout << ") = " << h2 << std::endl; */
+            passes++;
             if (h2 <= h1) {
                 selected[h] = std::move(sel);
+                distances.at(h) = h2;
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
+                distances.push_back(calculateH(selected[selected.size()-1]));
                 selectedSize++;
                 a++;
             }
-            for (unsigned int i = 0; i < selected.size(); i++) {
-                std::cout << "l" << i << " = ";
-                for (unsigned int s : selected[i]) {
-                    std::cout << "x" << s << " ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << "m = " << selectedSize << std::endl;
+            /* for (unsigned int i = 0; i < selected.size(); i++) { */
+            /*     std::cout << "l" << i << " = "; */
+            /*     for (unsigned int s : selected[i]) { */
+            /*         std::cout << "x" << s << " "; */
+            /*     } */
+            /*     std::cout << std::endl; */
+            /* } */
+            /* std::cout << "m = " << selectedSize << std::endl; */
         }
     }
+    /* for (unsigned int distance : distances) { */
+    /*     std::cout << " " << distance; */
+    /* } */
+    // std::cout << std::endl;
+    std::cout << "amount of args = " << AMOUNT_OF_PARAMETERS << std::endl;
+    std::cout << "nonlinearity = " << minH << std::endl;
+    /* std::cout << "passes = " << passes << std::endl; */
+    unsigned int realPasses = AMOUNT_OF_PARAMETERS + passes;
+    std::cout << "passes = " << realPasses << std::endl;
     
+    return realPasses;
     /* return sorted; */
 }
 
@@ -443,8 +474,24 @@ std::vector<std::pair<unsigned int, double>> Function::getSortedStatistics() {
         std::cout << "x" << stat.first << " = " << stat.second << std::endl;
     }
     std::cout << "--------------------------------------" << std::endl;
-
+    
     return statisticArray;
+
+    // To get statistic from variables, probabilities of which are greater than 0.3
+    /* std::vector<Interest> statisticTransformedArray; */
+    /* for (unsigned int i = 0; i < statisticArray.size(); i++) { */
+    /*     Interest& statistic = statisticArray[i]; */
+    /*     if(statistic.second > 0.3) { */
+    /*         statisticTransformedArray.push_back(statisticArray[i]); */
+    /*     } */
+    /* } */
+    /*  */
+    /* for (Interest stat : statisticTransformedArray) { */
+    /*     std::cout << "x" << stat.first << " = " << stat.second << std::endl; */
+    /* } */
+    /* std::cout << "--------------------------------------" << std::endl; */
+    /*  */
+    /* return statisticTransformedArray; */
 }
 
 
@@ -535,4 +582,41 @@ void Function::getLinearFunction(
     }
     std::cout << std::endl;
     std::cout << "--------------------------------------" << std::endl;
+}
+
+
+std::string Function::generateNonlinearFunc(unsigned int n) {
+    const unsigned int LENGTH = 1 << n;
+    std::string result;
+    unsigned int amountOfOnes = 0;
+    for (unsigned int i = 0; i < LENGTH; i++) {
+        char newBit = '0' + (std::rand() % 2);
+        result.append(1, newBit);
+        if (newBit == '1') {
+            amountOfOnes++;
+        }
+    }
+
+    // Check whether generated function is balanced.
+    // Need a correction if not balanced
+    if (amountOfOnes != (LENGTH / 2)) {
+        char charToCorrect;
+        unsigned int bitsToCorrect;
+        if (amountOfOnes < (LENGTH / 2)) {
+            charToCorrect = '1';
+            bitsToCorrect = LENGTH / 2 - amountOfOnes; 
+        } else {
+            charToCorrect = '0';
+            bitsToCorrect = amountOfOnes - LENGTH / 2;
+        }
+        for (unsigned int j = 0; j < bitsToCorrect; ) {
+            unsigned int pos = std::rand() % LENGTH;
+            if (result.at(pos) != charToCorrect) {
+                result.at(pos) = charToCorrect;
+                j++;
+            }
+        }
+    }
+
+    return result;
 }
