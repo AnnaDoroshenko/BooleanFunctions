@@ -12,6 +12,9 @@
 #include <ctime> //std::time
 #include <cstdlib> // std::rand
 #include <cassert>
+#include <thread>
+#include <chrono>
+
 
 
 class Function {
@@ -76,11 +79,13 @@ class Function {
     };
 
 
-    std::vector<std::vector<long long>> getBaseNumbers();
+    std::vector<long long> getBaseNumbersForIndex(unsigned int i);
     std::vector<Tuple> getTuples (
             const unsigned int& index,
             const std::vector<long long>& baseNumbers);
     void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples);
+    std::vector<Function::Tuple> getTuplesForIndex(unsigned int i,
+            const std::vector<long long>& baseNumbers);
 
     public:
     std::vector<double> getStatistics ();

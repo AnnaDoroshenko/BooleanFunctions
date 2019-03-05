@@ -364,10 +364,10 @@ const long long& Function::Tuple::operator[](unsigned int index) const {
 // Base number is a number, from which we get inverted number by one exact x.
 // Base number and inverted number form tuple.
 // For example, 000 - base number, 001 - number inverted by x2
-std::vector<std::vector<long long>> Function::getBaseNumbers() {
-    std::vector<std::vector<long long>> vectorOfBaseNumbers;
-    vectorOfBaseNumbers.reserve(AMOUNT_OF_PARAMETERS);
-    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
+std::vector<long long> Function::getBaseNumbersForIndex(unsigned int i) {
+    /* std::vector<std::vector<long long>> vectorOfBaseNumbers; */
+    // vectorOfBaseNumbers.reserve(AMOUNT_OF_PARAMETERS);
+    /* for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) { */
         std::vector<long long> currentVectorOfBaseNumbers;
         currentVectorOfBaseNumbers.reserve(AMOUNT_OF_VARIANTS / 2);
         // step is used for jumping by base numbers' intervals
@@ -381,10 +381,11 @@ std::vector<std::vector<long long>> Function::getBaseNumbers() {
             }
             step = (AMOUNT_OF_VARIANTS / (1 << i)) * (j + 1);
         }
-        vectorOfBaseNumbers.push_back(currentVectorOfBaseNumbers);
-    }
+        // vectorOfBaseNumbers.push_back(currentVectorOfBaseNumbers);
+        return currentVectorOfBaseNumbers;
+    // }
 
-    return vectorOfBaseNumbers;
+    /* return vectorOfBaseNumbers; */
 }
 
 
@@ -408,54 +409,63 @@ std::vector<Function::Tuple> Function::getTuples (
 }
 
 
-void Function::getArrayOfTuples (
-        std::vector<std::vector<Function::Tuple>>& arrayOfTuples) {
-    arrayOfTuples.reserve(AMOUNT_OF_PARAMETERS);
-    std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers();
-    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
-        std::vector<Tuple> currentArrayOfTuples = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]);
-        arrayOfTuples.push_back(currentArrayOfTuples);
-    }
+std::vector<Function::Tuple> Function::getTuplesForIndex(unsigned int i,
+        const std::vector<long long>& baseNumbers) {
+    return getTuples((AMOUNT_OF_PARAMETERS - 1 - i), baseNumbers);
 }
 
+/* void Function::getArrayOfTuples ( */
+/*         std::vector<std::vector<Function::Tuple>>& arrayOfTuples) { */
+/*     arrayOfTuples.reserve(AMOUNT_OF_PARAMETERS); */
+/*     std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers(); */
+/*     for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) { */
+/*         std::vector<Tuple> currentArrayOfTuples = getTuples((AMOUNT_OF_PARAMETERS - 1 - i), vectorOfBaseNumbers[i]); */
+/*         arrayOfTuples.push_back(currentArrayOfTuples); */
+/*     } */
+/* } */
 
-std::vector<double> Function::getStatistics() {
-    std::vector<double> statisticArray;
-    statisticArray.reserve(AMOUNT_OF_PARAMETERS);
-    std::vector<std::vector<Tuple>> arrayOfTuples;
-    getArrayOfTuples(arrayOfTuples);
-    for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
-        unsigned int count = 0;
-        const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i];
-        for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) {
-            const Tuple& currentTuple = currentVectorOfArrayOfTuples[j];
-            if (arguments[currentTuple[0]] != arguments[currentTuple[1]]) {
-                count++;
-            }
-            /* std::cout << arguments[currentTuple[0]] << ";" << arguments[currentTuple[1]] <<std::endl; */
-        }
-        // To see key values of calculation uncomment next three lines
-        /* std::cout << "count = " << count << std::endl; */
-        /* std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl; */
-        /* std::cout << std::endl; */
-        statisticArray.push_back(static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2));
-        std::cout << "x" << i << " => " << statisticArray[i] << std::endl;
-    }
-    std::cout << "--------------------------------------" << std::endl;
 
-    return statisticArray;
-}
+/* std::vector<double> Function::getStatistics() { */
+/*     std::vector<double> statisticArray; */
+/*     statisticArray.reserve(AMOUNT_OF_PARAMETERS); */
+/*     std::vector<std::vector<Tuple>> arrayOfTuples; */
+/*     getArrayOfTuples(arrayOfTuples); */
+/*     for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) { */
+/*         unsigned int count = 0; */
+/*         const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i]; */
+/*         for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) { */
+/*             const Tuple& currentTuple = currentVectorOfArrayOfTuples[j]; */
+/*             if (arguments[currentTuple[0]] != arguments[currentTuple[1]]) { */
+/*                 count++; */
+/*             } */
+/*             #<{(| std::cout << arguments[currentTuple[0]] << ";" << arguments[currentTuple[1]] <<std::endl; |)}># */
+/*         } */
+/*         // To see key values of calculation uncomment next three lines */
+/*         #<{(| std::cout << "count = " << count << std::endl; |)}># */
+/*         #<{(| std::cout << "AMOUNT_OF_VARIANTS = " << AMOUNT_OF_VARIANTS << std::endl; |)}># */
+/*         #<{(| std::cout << std::endl; |)}># */
+/*         statisticArray.push_back(static_cast<double>(count) / (AMOUNT_OF_VARIANTS / 2)); */
+/*         std::cout << "x" << i << " => " << statisticArray[i] << std::endl; */
+/*     } */
+/*     std::cout << "--------------------------------------" << std::endl; */
+/*  */
+/*     return statisticArray; */
+/* } */
 
 
 std::vector<std::pair<unsigned int, double>> Function::getSortedStatistics() {
     using Interest = std::pair<unsigned int, double>;
     std::vector<Interest> statisticArray;
     statisticArray.reserve(AMOUNT_OF_PARAMETERS);
-    std::vector<std::vector<Tuple>> arrayOfTuples;
-    getArrayOfTuples(arrayOfTuples);
+    // std::vector<std::vector<Tuple>> arrayOfTuples;
+    // getArrayOfTuples(arrayOfTuples);
+
+    /* const std::vector<std::vector<long long>> vectorOfBaseNumbers = getBaseNumbers(); */
     for (unsigned int i = 0; i < AMOUNT_OF_PARAMETERS; i++) {
         unsigned int count = 0;
-        const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i];
+        /* const std::vector<Tuple>& currentVectorOfArrayOfTuples = arrayOfTuples[i]; */
+        /* const std::vector<Tuple> currentVectorOfArrayOfTuples = getTuplesForIndex(i, vectorOfBaseNumbers); */
+        const std::vector<Tuple> currentVectorOfArrayOfTuples = getTuplesForIndex(i, getBaseNumbersForIndex(i));
         for (unsigned int j = 0; j < (AMOUNT_OF_VARIANTS / 2); j++) {
             const Tuple& currentTuple = currentVectorOfArrayOfTuples[j];
             if (arguments[currentTuple[0]] != arguments[currentTuple[1]]) {

@@ -6,7 +6,7 @@
 int main() {
 
     std::srand(std::time(nullptr));
-    const unsigned int N = 23;
+    const unsigned int N = 24;
     const unsigned int STATISTIC_AMOUNT = 1;
     std::vector<std::string> testFunctions;
     testFunctions.reserve(STATISTIC_AMOUNT);
@@ -33,6 +33,7 @@ int main() {
         // }
 
         std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
+
         unsigned int currN = testFunction.calculateMinH(testStat);
         nonlinearityStat.push_back(currN);
         std::cout << "======================================" << std::endl;
@@ -45,8 +46,8 @@ int main() {
     for (unsigned int k = 0; k < STATISTIC_AMOUNT; k++) {
         sum += nonlinearityStat.at(k);
     }
-    unsigned int mean = static_cast<unsigned int>(sum / STATISTIC_AMOUNT) + 1; 
+    unsigned int mean = static_cast<unsigned int>(sum / STATISTIC_AMOUNT) + 1;
     std::cout << "mean = " << mean << std::endl;
 
     return 0;
-} 
+}
