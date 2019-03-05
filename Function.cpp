@@ -7,7 +7,7 @@ Function::Function() :
     AMOUNT_OF_LAMBDA_FUNCTIONS(0) {}
 
 
-Function::Function(std::string input) : 
+Function::Function(std::string input) :
     AMOUNT_OF_PARAMETERS(log2(input.size())),
     AMOUNT_OF_VARIANTS(input.size()),
     AMOUNT_OF_LAMBDA_FUNCTIONS(AMOUNT_OF_VARIANTS * 2 - 2) {
@@ -52,12 +52,12 @@ const unsigned int& Function::operator[](unsigned int index) const {
 
 
 // Generation of the Truth Table
-void Function::generateTruthTable (std::vector<long long>& truthTable) {
-    truthTable.reserve(AMOUNT_OF_VARIANTS);
-    for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
-        truthTable.push_back(i);
-    }
-}
+/* void Function::generateTruthTable (std::vector<long long>& truthTable) { */
+/*     truthTable.reserve(AMOUNT_OF_VARIANTS); */
+/*     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) { */
+/*         truthTable.push_back(i); */
+/*     } */
+/* } */
 
 
 // Linear function format is x(0),x(1),..x(n) [1,x(0),x(1),..x(n)]
@@ -91,7 +91,7 @@ void Function::getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
     array.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
     // Starts with i = 2, because i is used for generation of linear functions
     // and functions f = 0 ==> [!1,!x(0),!x(1),..!x(n)]
-    // and f = 1 ==> [1,!x(0),!x(1),..!x(n)] are not included 
+    // and f = 1 ==> [1,!x(0),!x(1),..!x(n)] are not included
     for (unsigned int i = 2; i < (AMOUNT_OF_LAMBDA_FUNCTIONS + 2); i++){
         array.push_back(LinearFunction(i));
     }
@@ -99,8 +99,7 @@ void Function::getArrayOfLinearFunctions (std::vector<LinearFunction>& array) {
 
 
 void Function::getLambdaFunction (
-        const std::vector<long long>& truthTable, 
-        const LinearFunction& linearFunction, 
+        const LinearFunction& linearFunction,
         std::vector<unsigned int>& lambdaFunction) {
     lambdaFunction.reserve(AMOUNT_OF_VARIANTS);
     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
@@ -111,7 +110,8 @@ void Function::getLambdaFunction (
             j++;
         }
         for ( ; j < linearFunction.size(); j++) {
-            if ((truthTable[i] >> (linearFunction[j] - 1)) & 1) {
+            /* if ((truthTable[i] >> (linearFunction[j] - 1)) & 1) { */
+            if ((i >> (linearFunction[j] - 1)) & 1) {
                 currentResult ^= 1;
             }
         }
@@ -121,14 +121,13 @@ void Function::getLambdaFunction (
 
 
 void Function::getArrayOfLambdaFunctions (
-        const std::vector<long long>& truthTable, 
-        const std::vector<LinearFunction>& arrayOfLinearFunctions, 
+        const std::vector<LinearFunction>& arrayOfLinearFunctions,
         std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     arrayOfLambdaFunctions.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
     for (unsigned int i = 0; i < AMOUNT_OF_LAMBDA_FUNCTIONS; i++) {
         std::vector<unsigned int> currentLambdaFunction;
         currentLambdaFunction.reserve(AMOUNT_OF_VARIANTS);
-        getLambdaFunction(truthTable, arrayOfLinearFunctions[i], currentLambdaFunction);
+        getLambdaFunction(arrayOfLinearFunctions[i], currentLambdaFunction);
         arrayOfLambdaFunctions.push_back(currentLambdaFunction);
     }
 }
@@ -139,9 +138,9 @@ void Function::getArrayOfLambdaFunctions (
 // Be careful about input: [x(0), x(1), .. x(n), 1]
 // For example, f=x3 => 0...00100, so function expects 4
 unsigned int Function::calculateH(
-        std::vector<unsigned int>& indeces, const std::vector<long long>& truthTable) {
+        std::vector<unsigned int>& indices) {
     unsigned int decForm = 0;
-    for (unsigned int index : indeces) {
+    for (unsigned int index : indices) {
         decForm += 1 << (AMOUNT_OF_PARAMETERS - index);
     }
     LinearFunction linearFunction = LinearFunction(decForm);
@@ -149,7 +148,7 @@ unsigned int Function::calculateH(
     /* generateTruthTable(truthTable); */
     std::vector<unsigned int> lambdaFunction;
     lambdaFunction.reserve(AMOUNT_OF_VARIANTS);
-    getLambdaFunction(truthTable, linearFunction, lambdaFunction);
+    getLambdaFunction(linearFunction, lambdaFunction);
 
     // For Truth Table representation uncomment next loop
     /* for (unsigned int i = 0; i < lambdaFunction.size(); i++) { */
@@ -189,9 +188,9 @@ unsigned int Function::calculateMinH(
 
     std::vector<std::vector<unsigned int>> selected;
     selected.push_back({sorted[0]});
-        std::vector<long long> truthTable;
-        generateTruthTable(truthTable);
-    unsigned int minH = calculateH(selected[0], truthTable);
+        /* std::vector<long long> truthTable; */
+        /* generateTruthTable(truthTable); */
+    unsigned int minH = calculateH(selected[0]);
     distances.push_back(minH);
     unsigned int selectedSize = 1;
     /* std::cout << "k = 0, m = " << selectedSize; */
@@ -219,7 +218,7 @@ unsigned int Function::calculateMinH(
             /* for (unsigned int s: sel) { */
             /*     std::cout << s << std::endl; */
             /* } */
-            unsigned int h2 = calculateH(sel, truthTable);
+            unsigned int h2 = calculateH(sel);
             if (h2 < minH) {
                 minH = h2;
             }
@@ -239,7 +238,7 @@ unsigned int Function::calculateMinH(
                 distances.at(h) = h2;
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
-                distances.push_back(calculateH(selected[selected.size()-1], truthTable));
+                distances.push_back(calculateH(selected[selected.size()-1]));
                 selectedSize++;
                 a++;
             }
@@ -262,7 +261,7 @@ unsigned int Function::calculateMinH(
     /* std::cout << "passes = " << passes << std::endl; */
     unsigned int realPasses = AMOUNT_OF_PARAMETERS + passes;
     std::cout << "passes = " << realPasses << std::endl;
-    
+
     return realPasses;
     /* return sorted; */
 }
@@ -283,7 +282,6 @@ bool Function::alreadyAdded(
 // Also the closest linear functions can be shown
 /* unsigned int Function::getMinDistance ( */
 void Function::getMinDistance (
-        const std::vector<long long>& truthTable,
         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions) {
     const unsigned int COUNT = arrayOfLambdaFunctions.size();
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
@@ -319,8 +317,8 @@ void Function::getMinDistance (
                std::cout << currentLFunc[j];
            }
            std::cout << std::endl;
-           getLinearFunction(truthTable, currentLFunc);
-       } 
+           getLinearFunction(currentLFunc);
+       }
     }
 
     /* return nonlinearity; */
@@ -329,8 +327,8 @@ void Function::getMinDistance (
 
 /* unsigned int Function::calculateNonlinearity() { */
 void Function::calculateNonlinearity() {
-    std::vector<long long> truthTable;
-    generateTruthTable(truthTable);
+    /* std::vector<long long> truthTable; */
+    // generateTruthTable(truthTable);
 
     std::vector<LinearFunction> arrayOfLinFunc;
     getArrayOfLinearFunctions(arrayOfLinFunc);
@@ -338,10 +336,10 @@ void Function::calculateNonlinearity() {
     std::vector<std::vector<unsigned int>> arrayOfLambdaFunc;
     arrayOfLambdaFunc.reserve(AMOUNT_OF_LAMBDA_FUNCTIONS);
 
-    getArrayOfLambdaFunctions(truthTable, arrayOfLinFunc, arrayOfLambdaFunc);
+    getArrayOfLambdaFunctions(arrayOfLinFunc, arrayOfLambdaFunc);
 
     /* return getMinDistance(truthTable, arrayOfLambdaFunc); */
-    getMinDistance(truthTable, arrayOfLambdaFunc);
+    getMinDistance(arrayOfLambdaFunc);
 }
 
 
@@ -387,13 +385,13 @@ std::vector<std::vector<long long>> Function::getBaseNumbers() {
         }
         vectorOfBaseNumbers.push_back(currentVectorOfBaseNumbers);
     }
-    
+
     return vectorOfBaseNumbers;
 }
 
 
 std::vector<Function::Tuple> Function::getTuples (
-        const unsigned int& index, 
+        const unsigned int& index,
         const std::vector<long long>& baseNumbers) {
     std::vector<Tuple> tuples;
     tuples.reserve(AMOUNT_OF_VARIANTS / 2);
@@ -476,7 +474,7 @@ std::vector<std::pair<unsigned int, double>> Function::getSortedStatistics() {
         std::cout << "x" << stat.first << " = " << stat.second << std::endl;
     }
     std::cout << "--------------------------------------" << std::endl;
-    
+
     return statisticArray;
 
     // To get statistic from variables, probabilities of which are greater than 0.3
@@ -515,7 +513,6 @@ bool Function::Brace::inverted() {
 
 
 void Function::getLinearFunction(
-        const std::vector<long long>& truthTable, 
         const std::vector<unsigned int>& currentLamdaFunc) {
     using Argument = std::vector<Brace>;
     bool presenceTable[AMOUNT_OF_VARIANTS];
@@ -523,7 +520,8 @@ void Function::getLinearFunction(
 
     for (unsigned int i = 0; i < AMOUNT_OF_VARIANTS; i++) {
         if (currentLamdaFunc[i] == 0) continue;
-        long long row = truthTable[i];
+        /* long long row = truthTable[i]; */
+        long long row = i;
         Argument currentArg;
         currentArg.reserve(AMOUNT_OF_PARAMETERS);
         for (int j = (AMOUNT_OF_PARAMETERS - 1); j >= 0; j--) {
@@ -606,7 +604,7 @@ std::string Function::generateNonlinearFunc(unsigned int n) {
         unsigned int bitsToCorrect;
         if (amountOfOnes < (LENGTH / 2)) {
             charToCorrect = '1';
-            bitsToCorrect = LENGTH / 2 - amountOfOnes; 
+            bitsToCorrect = LENGTH / 2 - amountOfOnes;
         } else {
             charToCorrect = '0';
             bitsToCorrect = amountOfOnes - LENGTH / 2;

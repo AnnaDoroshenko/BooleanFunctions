@@ -24,7 +24,7 @@ class Function {
     Function(std::string input);
     /* unsigned int calculateNonlinearity(); */
     void calculateNonlinearity();
-    unsigned int calculateH(std::vector<unsigned int>& indeces, const std::vector<long long>& truthTable);
+    unsigned int calculateH(std::vector<unsigned int>& indeces);
     unsigned int calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
 
     private:
@@ -46,21 +46,18 @@ class Function {
     };
 
 
-    void generateTruthTable (std::vector<long long>& truthTable);
+    /* void generateTruthTable (std::vector<long long>& truthTable); */
     void getArrayOfLinearFunctions (std::vector<LinearFunction>& array);
     void getLambdaFunction (
-            const std::vector<long long>& truthTable,
             const LinearFunction& linearFunction,
             std::vector<unsigned int>& lambdaFunction);
     void getArrayOfLambdaFunctions (
-            const std::vector<long long>& truthTable, 
-            const std::vector<LinearFunction>& arrayOfLinearFunctions, 
+            const std::vector<LinearFunction>& arrayOfLinearFunctions,
             std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
     /* unsigned int getMinDistance ( */
     /*         const std::vector<long long>& trurhTable, */
     /*         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions); */
     void getMinDistance (
-            const std::vector<long long>& trurhTable,
             const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
 
 
@@ -69,7 +66,7 @@ class Function {
             std::vector<long long> elements;
 
         public:
-            Tuple(); 
+            Tuple();
             Tuple(long long number1, long long number2);
             long long& operator[](unsigned int index);
             const long long& operator[](unsigned int index) const;
@@ -78,7 +75,7 @@ class Function {
 
     std::vector<std::vector<long long>> getBaseNumbers();
     std::vector<Tuple> getTuples (
-            const unsigned int& index, 
+            const unsigned int& index,
             const std::vector<long long>& baseNumbers);
     void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples);
 
@@ -101,7 +98,6 @@ class Function {
 
 
     void getLinearFunction(
-            const std::vector<long long>& truthTable, 
             const std::vector<unsigned int>& currentLamdaFunc);
 };
 
