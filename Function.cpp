@@ -111,9 +111,10 @@ void Function::getLambdaFunction (
         }
         for ( ; j < linearFunction.size(); j++) {
             /* if ((truthTable[i] >> (linearFunction[j] - 1)) & 1) { */
-            if ((i >> (linearFunction[j] - 1)) & 1) {
-                currentResult ^= 1;
-            }
+            /* if ((i >> (linearFunction[j] - 1)) & 1) { */
+            /*     currentResult ^= 1; */
+            /* } */
+            currentResult ^= (i >> (linearFunction[j] - 1)) & 1;
         }
         lambdaFunction.push_back(currentResult);
     }
@@ -141,9 +142,9 @@ unsigned int Function::calculateH(
         std::vector<unsigned int>& indices) {
     unsigned int decForm = 0;
     for (unsigned int index : indices) {
-        decForm += 1 << (AMOUNT_OF_PARAMETERS - index);
+        decForm |= 1 << (AMOUNT_OF_PARAMETERS - index);
     }
-    LinearFunction linearFunction = LinearFunction(decForm);
+    LinearFunction linearFunction(decForm);
     /* std::vector<long long> truthTable; */
     /* generateTruthTable(truthTable); */
     std::vector<unsigned int> lambdaFunction;
@@ -345,21 +346,18 @@ void Function::calculateNonlinearity() {
 
 // Format of a tuple is {number1, number2}
 // numbers differ by one bit (for example, {100, 101})
-Function::Tuple::Tuple() {
-    elements = {0, 0};
-}
+Function::Tuple::Tuple() : number1(0), number2(0) {}
 
-Function::Tuple::Tuple(long long number1, long long number2) {
-    elements.push_back(number1);
-    elements.push_back(number2);
-}
+Function::Tuple::Tuple(long long number1, long long number2) : number1(number1), number2(number2) {}
 
 long long& Function::Tuple::operator[](unsigned int index) {
-    return elements[index];
+    assert(index <= 1);
+    return (index == 0 ? number1 : number2);
 }
 
 const long long& Function::Tuple::operator[](unsigned int index) const {
-    return elements[index];
+    assert(index <= 1);
+    return (index == 0 ? number1 : number2);
 }
 
 

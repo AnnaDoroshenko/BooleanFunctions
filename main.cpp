@@ -6,7 +6,7 @@
 int main() {
 
     std::srand(std::time(nullptr));
-    const unsigned int N = 21;
+    const unsigned int N = 23;
     const unsigned int STATISTIC_AMOUNT = 1;
     std::vector<std::string> testFunctions;
     testFunctions.reserve(STATISTIC_AMOUNT);

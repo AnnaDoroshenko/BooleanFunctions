@@ -11,6 +11,7 @@
 #include <algorithm> // std::sort
 #include <ctime> //std::time
 #include <cstdlib> // std::rand
+#include <cassert>
 
 
 class Function {
@@ -63,7 +64,9 @@ class Function {
 
     struct Tuple {
         private:
-            std::vector<long long> elements;
+            /* std::vector<long long> elements; */
+            long long number1;
+            long long number2;
 
         public:
             Tuple();
