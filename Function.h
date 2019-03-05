@@ -24,7 +24,7 @@ class Function {
     Function(std::string input);
     /* unsigned int calculateNonlinearity(); */
     void calculateNonlinearity();
-    unsigned int calculateH(std::vector<unsigned int>& indeces);
+    unsigned int calculateH(std::vector<unsigned int>& indeces, const std::vector<long long>& truthTable);
     unsigned int calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
 
     private:

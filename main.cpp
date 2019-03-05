@@ -6,8 +6,8 @@
 int main() {
 
     std::srand(std::time(nullptr));
-    const unsigned int N = 16;
-    const unsigned int STATISTIC_AMOUNT = 10;
+    const unsigned int N = 21;
+    const unsigned int STATISTIC_AMOUNT = 1;
     std::vector<std::string> testFunctions;
     testFunctions.reserve(STATISTIC_AMOUNT);
     for (unsigned int count = 0; count < STATISTIC_AMOUNT; count++) {
@@ -26,11 +26,11 @@ int main() {
         std::cout << "---------------- " << i <<" ------------------" << std::endl;
         Function testFunction(testFunctions[i]);
 
-        try {
-            testFunction.calculateNonlinearity();
-        } catch(const std::invalid_argument& e) {
-            std::cerr << e.what() << std::endl;
-        }
+        // try {
+        //     testFunction.calculateNonlinearity();
+        // } catch(const std::invalid_argument& e) {
+        //     std::cerr << e.what() << std::endl;
+        // }
 
         std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
         unsigned int currN = testFunction.calculateMinH(testStat);

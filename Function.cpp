@@ -12,7 +12,7 @@ Function::Function(std::string input) :
     AMOUNT_OF_VARIANTS(input.size()),
     AMOUNT_OF_LAMBDA_FUNCTIONS(AMOUNT_OF_VARIANTS * 2 - 2) {
         std::cout << "--------------------------------------" << std::endl;
-        std::cout << "Input: " << input << std::endl;
+        std::cout << "Input: " << " ... was here ..." << std::endl;
         std::cout << "--------------------------------------" << std::endl;
 
         unsigned int s = input.size();
@@ -139,14 +139,14 @@ void Function::getArrayOfLambdaFunctions (
 // Be careful about input: [x(0), x(1), .. x(n), 1]
 // For example, f=x3 => 0...00100, so function expects 4
 unsigned int Function::calculateH(
-        std::vector<unsigned int>& indeces) {
+        std::vector<unsigned int>& indeces, const std::vector<long long>& truthTable) {
     unsigned int decForm = 0;
     for (unsigned int index : indeces) {
         decForm += 1 << (AMOUNT_OF_PARAMETERS - index);
     }
     LinearFunction linearFunction = LinearFunction(decForm);
-    std::vector<long long> truthTable;
-    generateTruthTable(truthTable);
+    /* std::vector<long long> truthTable; */
+    /* generateTruthTable(truthTable); */
     std::vector<unsigned int> lambdaFunction;
     lambdaFunction.reserve(AMOUNT_OF_VARIANTS);
     getLambdaFunction(truthTable, linearFunction, lambdaFunction);
@@ -189,7 +189,9 @@ unsigned int Function::calculateMinH(
 
     std::vector<std::vector<unsigned int>> selected;
     selected.push_back({sorted[0]});
-    unsigned int minH = calculateH(selected[0]);
+        std::vector<long long> truthTable;
+        generateTruthTable(truthTable);
+    unsigned int minH = calculateH(selected[0], truthTable);
     distances.push_back(minH);
     unsigned int selectedSize = 1;
     /* std::cout << "k = 0, m = " << selectedSize; */
@@ -217,7 +219,7 @@ unsigned int Function::calculateMinH(
             /* for (unsigned int s: sel) { */
             /*     std::cout << s << std::endl; */
             /* } */
-            unsigned int h2 = calculateH(sel);
+            unsigned int h2 = calculateH(sel, truthTable);
             if (h2 < minH) {
                 minH = h2;
             }
@@ -237,7 +239,7 @@ unsigned int Function::calculateMinH(
                 distances.at(h) = h2;
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
-                distances.push_back(calculateH(selected[selected.size()-1]));
+                distances.push_back(calculateH(selected[selected.size()-1], truthTable));
                 selectedSize++;
                 a++;
             }
