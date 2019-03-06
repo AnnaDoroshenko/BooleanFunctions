@@ -7,7 +7,7 @@ justHeaderFiles =
 # Compilation flags
 OPTIMIZATION_FLAG = -O2
 LANGUAGE_LEVEL = -std=c++17
-COMPILER_FLAGS = -Wall -Wextra -Wno-unused-parameter
+COMPILER_FLAGS = -Wall -Wextra -Wno-unused-parameter -pthread
 LINKER_FLAGS =
 
 

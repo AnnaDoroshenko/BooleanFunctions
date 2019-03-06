@@ -1,13 +1,16 @@
 #include <iostream>
 #include <exception>
+#include <mutex>
+#include <thread>
 #include "Function.h"
+
 
 
 int main() {
 
     std::srand(std::time(nullptr));
     const unsigned int N = 24;
-    const unsigned int STATISTIC_AMOUNT = 1;
+    const unsigned int STATISTIC_AMOUNT = 100;
     std::vector<std::string> testFunctions;
     testFunctions.reserve(STATISTIC_AMOUNT);
     for (unsigned int count = 0; count < STATISTIC_AMOUNT; count++) {
@@ -16,31 +19,40 @@ int main() {
         testFunctions.push_back(funcString);
     }
 
-    /* for (unsigned int i = 0; i < STATISTIC_AMOUNT; i++) { */
-    /*     std::cout << testFunctions[i] << std::endl; */
-    /* } */
-
     std::vector<unsigned int> nonlinearityStat;
     nonlinearityStat.reserve(STATISTIC_AMOUNT);
-    for (unsigned int i = 0; i < testFunctions.size(); i++) {
-        std::cout << "---------------- " << i <<" ------------------" << std::endl;
-        Function testFunction(testFunctions[i]);
 
-        // try {
-        //     testFunction.calculateNonlinearity();
-        // } catch(const std::invalid_argument& e) {
-        //     std::cerr << e.what() << std::endl;
-        // }
 
-        std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
+    const unsigned int THREADS_COUNT = 8;
+    std::mutex mtx;
+    auto statisticsStep = [&mtx, &testFunctions, &nonlinearityStat](unsigned int threadId) {
+        for (unsigned int i = threadId; i < STATISTIC_AMOUNT; i += THREADS_COUNT) {
+            std::cout << "---------------- " << i <<" ------------------" << std::endl;
+            Function testFunction(testFunctions[i]);
 
-        unsigned int currN = testFunction.calculateMinH(testStat);
-        nonlinearityStat.push_back(currN);
-        std::cout << "======================================" << std::endl;
-        std::cout << "======================================" << std::endl;
-        /* std::vector<unsigned int> index = {1}; */
-        /* testFunction.calculateH(index); */
+            // try {
+            //     testFunction.calculateNonlinearity();
+            // } catch(const std::invalid_argument& e) {
+            //     std::cerr << e.what() << std::endl;
+            // }
+
+            std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
+
+            unsigned int currN = testFunction.calculateMinH(testStat);
+            mtx.lock();
+            nonlinearityStat.push_back(currN);
+            mtx.unlock();
+            std::cout << "======================================" << std::endl;
+            std::cout << "======================================" << std::endl;
+            /* std::vector<unsigned int> index = {1}; */
+            /* testFunction.calculateH(index); */
+        }
+    };
+    std::thread threads[THREADS_COUNT];
+    for (unsigned int threadId = 0; threadId < THREADS_COUNT; threadId++) {
+        threads[threadId] = std::thread(statisticsStep, threadId);
     }
+    for (auto& thread : threads) thread.join();
 
     unsigned int sum = 0;
     for (unsigned int k = 0; k < STATISTIC_AMOUNT; k++) {
