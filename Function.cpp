@@ -596,10 +596,12 @@ void Function::getLinearFunction(
 std::string Function::generateNonlinearFunc(unsigned int n) {
     const unsigned int LENGTH = 1 << n;
     std::string result;
+    result.reserve(LENGTH);
     unsigned int amountOfOnes = 0;
     for (unsigned int i = 0; i < LENGTH; i++) {
         char newBit = '0' + (std::rand() % 2);
-        result.append(1, newBit);
+        // result.append(1, newBit);
+        result.push_back(newBit);
         if (newBit == '1') {
             amountOfOnes++;
         }

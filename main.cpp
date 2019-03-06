@@ -5,30 +5,29 @@
 #include "Function.h"
 
 
-
 int main() {
-
     std::srand(std::time(nullptr));
-    const unsigned int N = 24;
+    const unsigned int N = 28;
     const unsigned int STATISTIC_AMOUNT = 100;
-    std::vector<std::string> testFunctions;
-    testFunctions.reserve(STATISTIC_AMOUNT);
-    for (unsigned int count = 0; count < STATISTIC_AMOUNT; count++) {
-        Function generateNLF;
-        std::string funcString = generateNLF.generateNonlinearFunc(N);
-        testFunctions.push_back(funcString);
-    }
+    /* std::vector<std::string> testFunctions; */
+    /* testFunctions.reserve(STATISTIC_AMOUNT); */
+    /* for (unsigned int count = 0; count < STATISTIC_AMOUNT; count++) { */
+    /*     Function generateNLF; */
+    /*     std::string funcString = generateNLF.generateNonlinearFunc(N); */
+    /*     testFunctions.push_back(funcString); */
+    /* } */
 
     std::vector<unsigned int> nonlinearityStat;
     nonlinearityStat.reserve(STATISTIC_AMOUNT);
 
 
-    const unsigned int THREADS_COUNT = 8;
+    const unsigned int THREADS_COUNT = 4;
     std::mutex mtx;
-    auto statisticsStep = [&mtx, &testFunctions, &nonlinearityStat](unsigned int threadId) {
+    Function generateNLF;
+    auto statisticsStep = [&mtx, &generateNLF, &nonlinearityStat](unsigned int threadId) {
         for (unsigned int i = threadId; i < STATISTIC_AMOUNT; i += THREADS_COUNT) {
             std::cout << "---------------- " << i <<" ------------------" << std::endl;
-            Function testFunction(testFunctions[i]);
+            Function testFunction(generateNLF.generateNonlinearFunc(N));
 
             // try {
             //     testFunction.calculateNonlinearity();
@@ -36,9 +35,11 @@ int main() {
             //     std::cerr << e.what() << std::endl;
             // }
 
+            std::cout << "---- " << i <<" has generated string func." << std::endl;
+
             std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
 
-            unsigned int currN = testFunction.calculateMinH(testStat);
+            const unsigned int currN = testFunction.calculateMinH(testStat);
             mtx.lock();
             nonlinearityStat.push_back(currN);
             mtx.unlock();

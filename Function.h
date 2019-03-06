@@ -90,7 +90,7 @@ class Function {
     public:
     std::vector<double> getStatistics ();
     std::vector<std::pair<unsigned int, double>> getSortedStatistics();
-    std::string generateNonlinearFunc(unsigned int n);
+    static std::string generateNonlinearFunc(unsigned int n);
 
 
     struct Brace {
