@@ -1,11 +1,11 @@
 # The name of the main file and executable
 mainFileName = main
 # Files that have .h and .cpp versions
-classFiles = Function
+classFiles =
 # Files that only have the .h version
 justHeaderFiles =
 # Compilation flags
-OPTIMIZATION_FLAG = -O2
+OPTIMIZATION_FLAG = -O0
 LANGUAGE_LEVEL = -std=c++17
 COMPILER_FLAGS = -Wall -Wextra -Wno-unused-parameter -pthread
 LINKER_FLAGS =
@@ -30,7 +30,7 @@ $(mainFileName): $(filesObj)
 
 # Utils
 clean:
-	rm -f *.o $(mainFileName)
+	rm -f *.o $(mainFileName) *.gch .*.gch
 
 cleanExe:
 	rm -f $(mainFileName)

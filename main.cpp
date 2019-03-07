@@ -7,27 +7,18 @@
 
 int main() {
     std::srand(std::time(nullptr));
-    const unsigned int N = 28;
-    const unsigned int STATISTIC_AMOUNT = 100;
-    /* std::vector<std::string> testFunctions; */
-    /* testFunctions.reserve(STATISTIC_AMOUNT); */
-    /* for (unsigned int count = 0; count < STATISTIC_AMOUNT; count++) { */
-    /*     Function generateNLF; */
-    /*     std::string funcString = generateNLF.generateNonlinearFunc(N); */
-    /*     testFunctions.push_back(funcString); */
-    /* } */
+    const unsigned int N = 20;
+    const unsigned int STATISTIC_AMOUNT = 4;
 
     std::vector<unsigned int> nonlinearityStat;
     nonlinearityStat.reserve(STATISTIC_AMOUNT);
 
-
     const unsigned int THREADS_COUNT = 4;
     std::mutex mtx;
-    Function generateNLF;
-    auto statisticsStep = [&mtx, &generateNLF, &nonlinearityStat](unsigned int threadId) {
+    auto statisticsStep = [&mtx, &nonlinearityStat](unsigned int threadId) {
         for (unsigned int i = threadId; i < STATISTIC_AMOUNT; i += THREADS_COUNT) {
             std::cout << "---------------- " << i <<" ------------------" << std::endl;
-            Function testFunction(generateNLF.generateNonlinearFunc(N));
+            const auto testFunction = Function<N>::generateNonlinearFunc();
 
             // try {
             //     testFunction.calculateNonlinearity();
@@ -35,11 +26,10 @@ int main() {
             //     std::cerr << e.what() << std::endl;
             // }
 
-            std::cout << "---- " << i <<" has generated string func." << std::endl;
-
-            std::vector<std::pair<unsigned int, double>> testStat = testFunction.getSortedStatistics();
-
-            const unsigned int currN = testFunction.calculateMinH(testStat);
+            std::cout << "---- " << i <<" has created func." << std::endl;
+            const auto sortedStats = testFunction.getSortedStatistics();
+            std::cout << "---- " << i <<" has generated stats." << std::endl;
+            const unsigned int currN = testFunction.calculateMinH(std::move(sortedStats));
             mtx.lock();
             nonlinearityStat.push_back(currN);
             mtx.unlock();
@@ -55,6 +45,7 @@ int main() {
     }
     for (auto& thread : threads) thread.join();
 
+    // Stats
     unsigned int sum = 0;
     for (unsigned int k = 0; k < STATISTIC_AMOUNT; k++) {
         sum += nonlinearityStat.at(k);

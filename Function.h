@@ -14,27 +14,28 @@
 #include <cassert>
 #include <thread>
 #include <chrono>
+#include <bitset>
 
 
+inline constexpr unsigned int ROWS(unsigned int parameters) { return 1 << parameters; }
+inline constexpr unsigned int LAMBDA_FUNCTIONS(unsigned int parameters) { return (parameters << 1) - 2; }
 
+template<std::size_t PARAMETERS>
 class Function {
-    const unsigned int AMOUNT_OF_PARAMETERS;
-    const unsigned int AMOUNT_OF_VARIANTS;
-    const unsigned int AMOUNT_OF_LAMBDA_FUNCTIONS;
-    std::vector<unsigned int> arguments;
+    private:
+
+    const std::bitset<ROWS(PARAMETERS)> values;
 
     public:
-    Function();
-    Function(std::string input);
-    /* unsigned int calculateNonlinearity(); */
-    void calculateNonlinearity();
-    unsigned int calculateH(std::vector<unsigned int>& indeces);
-    unsigned int calculateMinH(std::vector<std::pair<unsigned int, double>>& sortedStats);
+    explicit Function(std::bitset<ROWS(PARAMETERS)>&& values);
+    void calculateNonlinearity() const;
+    unsigned int calculateH(std::vector<unsigned int>& indeces) const;
+    unsigned int calculateMinH(
+        const std::array<std::pair<unsigned int, double>, PARAMETERS>&& sortedStats) const;
 
     private:
-    unsigned int& operator[](unsigned int index);
-    const unsigned int& operator[](unsigned int index) const;
-    bool alreadyAdded(std::vector<std::vector<unsigned int>>& selected, unsigned int& test);
+    bool operator[](unsigned int index) const;
+    bool alreadyAdded(const std::vector<std::vector<unsigned int>>& selected, unsigned int test) const;
 
 
     struct LinearFunction {
@@ -50,24 +51,12 @@ class Function {
     };
 
 
-    /* void generateTruthTable (std::vector<long long>& truthTable); */
-    void getArrayOfLinearFunctions (std::vector<LinearFunction>& array);
-    void getLambdaFunction (
-            const LinearFunction& linearFunction,
-            std::vector<unsigned int>& lambdaFunction);
-    void getArrayOfLambdaFunctions (
-            const std::vector<LinearFunction>& arrayOfLinearFunctions,
-            std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
-    /* unsigned int getMinDistance ( */
-    /*         const std::vector<long long>& trurhTable, */
-    /*         const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions); */
-    void getMinDistance (
-            const std::vector<std::vector<unsigned int>>& arrayOfLambdaFunctions);
+    std::bitset<ROWS(PARAMETERS)> getLambdaFunction(unsigned int index) const;
+    void getMinDistance() const;
 
 
     struct Tuple {
         private:
-            /* std::vector<long long> elements; */
             long long number1;
             long long number2;
 
@@ -79,18 +68,21 @@ class Function {
     };
 
 
-    std::vector<long long> getBaseNumbersForIndex(unsigned int i);
+    std::vector<long long> getBaseNumbersForIndex(unsigned int i) const;
+    long long getBaseNumber(unsigned int parameter, unsigned int index) const;
     std::vector<Tuple> getTuples (
             const unsigned int& index,
-            const std::vector<long long>& baseNumbers);
-    void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples);
+            const std::vector<long long>& baseNumbers) const;
+    Tuple getTuple(long long baseNumber, unsigned int bitToInvert) const;
+
+    void getArrayOfTuples (std::vector<std::vector<Function::Tuple>>& arrayOfTuples) const;
     std::vector<Function::Tuple> getTuplesForIndex(unsigned int i,
-            const std::vector<long long>& baseNumbers);
+            const std::vector<long long>& baseNumbers) const;
 
     public:
-    std::vector<double> getStatistics ();
-    std::vector<std::pair<unsigned int, double>> getSortedStatistics();
-    static std::string generateNonlinearFunc(unsigned int n);
+    std::vector<double> getStatistics() const;
+    std::array<std::pair<unsigned int, double>, PARAMETERS> getSortedStatistics() const;
+    static Function generateNonlinearFunc();
 
 
     struct Brace {
@@ -100,14 +92,13 @@ class Function {
         public:
             Brace();
             Brace(unsigned int arg, bool isInverted);
-            unsigned int index();
-            bool inverted();
+            unsigned int index() const;
+            bool inverted() const;
     };
 
-
-    void getLinearFunction(
-            const std::vector<unsigned int>& currentLamdaFunc);
+    void getLinearFunction(const std::bitset<ROWS(PARAMETERS)>& currentLamdaFunc) const;
 };
 
+#include "Function.tcc"
 
 #endif

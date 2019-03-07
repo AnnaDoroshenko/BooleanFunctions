@@ -1,3 +1,5 @@
 *.o
 a.out
 *.gch
+main
+*.txt
