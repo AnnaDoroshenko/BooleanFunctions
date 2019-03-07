@@ -155,8 +155,6 @@ unsigned int Function<PARAMETERS>::calculateMinH(
 
     std::vector<std::vector<unsigned int>> selected;
     selected.push_back({sorted[0]});
-        /* std::vector<long long> truthTable; */
-        /* generateTruthTable(truthTable); */
     unsigned int minH = calculateH(selected[0]);
     distances.push_back(minH);
     unsigned int selectedSize = 1;
@@ -205,7 +203,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
                 distances.at(h) = h2;
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
-                distances.push_back(calculateH(selected[selected.size()-1]));
+                distances.push_back(calculateH(selected.back()));
                 selectedSize++;
                 a++;
             }
