@@ -16,6 +16,23 @@
 #include <chrono>
 
 
+inline unsigned long fastRand() {
+    static unsigned long x = 123456789;
+    static unsigned long y = 362436069;
+    static unsigned long z = 521288629;
+    unsigned long t;
+    x ^= x << 16;
+    x ^= x >> 5;
+    x ^= x << 1;
+
+    t = x;
+    x = y;
+    y = z;
+    z = t ^ x ^ y;
+    return z;
+}
+
+
 inline constexpr long long ROWS(long long parameters) { return 1 << parameters; }
 inline constexpr long long LAMBDA_FUNCTIONS(long long parameters) { return (ROWS(parameters) << 1) - 2; }
 
@@ -112,7 +129,8 @@ Function<PARAMETERS> generateNonlinearFunc() {
     // std::bitset<ROWS(PARAMETERS)> result;
     unsigned int amountOfOnes = 0;
     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
-        const bool newBit = std::rand() % 2 == 0;
+        /* const bool newBit = std::rand() % 2 == 0; */
+        const bool newBit = fastRand() % 2 == 0;
         result[i] = newBit;
         if (newBit) amountOfOnes++;
     }
@@ -123,7 +141,8 @@ Function<PARAMETERS> generateNonlinearFunc() {
     while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
         unsigned int pos;
         do { // Keep looking until have found a wrong bit
-            pos = std::rand() % ROWS(PARAMETERS);
+            // pos = std::rand() % ROWS(PARAMETERS);
+            pos = fastRand() % ROWS(PARAMETERS);
         } while (result[pos] == newBit);
         // result.flip(pos);
         result[pos] = newBit;

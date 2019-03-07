@@ -6,7 +6,7 @@
 
 int main() {
     std::srand(std::time(nullptr));
-    const unsigned int N = 24;
+    const unsigned int N = 28;
     const unsigned int STATISTIC_AMOUNT = 4;
 
     std::vector<unsigned int> nonlinearityStat;
