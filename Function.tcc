@@ -142,11 +142,9 @@ unsigned int Function<PARAMETERS>::calculateMinH(
         const std::array<std::pair<unsigned int, double>, PARAMETERS>&& sortedStats) const {
     std::array<unsigned int, PARAMETERS> sorted;
     std::vector<unsigned int> distances;
-    // sorted.reserve(AMOUNT_OF_PARAMETERS);
     distances.reserve(PARAMETERS);
     for (unsigned int i = 0; i < sortedStats.size(); i++) {
         sorted[i] = sortedStats[i].first;
-        // sorted.push_back(stat.first);
     }
     std::cout << "sorted = [ ";
     for (unsigned int s : sorted) {

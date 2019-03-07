@@ -7,8 +7,8 @@
 
 int main() {
     std::srand(std::time(nullptr));
-    const unsigned int N = 20;
-    const unsigned int STATISTIC_AMOUNT = 4;
+    const unsigned int N = 24;
+    const unsigned int STATISTIC_AMOUNT = 8;
 
     std::vector<unsigned int> nonlinearityStat;
     nonlinearityStat.reserve(STATISTIC_AMOUNT);
