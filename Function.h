@@ -14,20 +14,22 @@
 #include <cassert>
 #include <thread>
 #include <chrono>
-#include <bitset>
 
 
-inline constexpr unsigned int ROWS(unsigned int parameters) { return 1 << parameters; }
-inline constexpr unsigned int LAMBDA_FUNCTIONS(unsigned int parameters) { return (parameters << 1) - 2; }
+inline constexpr long long ROWS(long long parameters) { return 1 << parameters; }
+inline constexpr long long LAMBDA_FUNCTIONS(long long parameters) { return (ROWS(parameters) << 1) - 2; }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 class Function {
     private:
 
-    const std::bitset<ROWS(PARAMETERS)> values;
+    const std::vector<bool> values;
+    /* const std::bitset<ROWS(PARAMETERS)> values; */
 
     public:
-    explicit Function(std::bitset<ROWS(PARAMETERS)>&& values);
+    explicit Function(std::vector<bool>&& values);
+    // explicit Function(std::bitset<ROWS(PARAMETERS)> values);
+
     void calculateNonlinearity() const;
     unsigned int calculateH(std::vector<unsigned int>& indeces) const;
     unsigned int calculateMinH(
@@ -51,7 +53,8 @@ class Function {
     };
 
 
-    std::bitset<ROWS(PARAMETERS)> getLambdaFunction(unsigned int index) const;
+    std::vector<bool> getLambdaFunction(unsigned int index) const;
+    /* std::bitset<ROWS(PARAMETERS)> getLambdaFunction(unsigned int index) const; */
     void getMinDistance() const;
 
 
@@ -82,8 +85,8 @@ class Function {
     public:
     std::vector<double> getStatistics() const;
     std::array<std::pair<unsigned int, double>, PARAMETERS> getSortedStatistics() const;
-    static Function generateNonlinearFunc();
 
+    static Function<PARAMETERS> generateNonlinearFunc();
 
     struct Brace {
         private:
@@ -96,8 +99,39 @@ class Function {
             bool inverted() const;
     };
 
-    void getLinearFunction(const std::bitset<ROWS(PARAMETERS)>& currentLamdaFunc) const;
+    // TODO
+    void getLinearFunction(const std::vector<bool>& currentLamdaFunc) const;
+    /* void getLinearFunction(const std::bitset<ROWS(PARAMETERS)>& currentLamdaFunc) const; */
 };
+
+
+template<unsigned int PARAMETERS>
+// std::bitset<ROWS(PARAMETERS)> generateNonlinearFunc() {
+Function<PARAMETERS> generateNonlinearFunc() {
+    std::vector<bool> result(ROWS(PARAMETERS));
+    // std::bitset<ROWS(PARAMETERS)> result;
+    unsigned int amountOfOnes = 0;
+    for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
+        const bool newBit = std::rand() % 2 == 0;
+        result[i] = newBit;
+        if (newBit) amountOfOnes++;
+    }
+
+    // Check whether generated function is balanced.
+    // Need a correction if not balanced
+    const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
+    while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
+        unsigned int pos;
+        do { // Keep looking until have found a wrong bit
+            pos = std::rand() % ROWS(PARAMETERS);
+        } while (result[pos] == newBit);
+        // result.flip(pos);
+        result[pos] = newBit;
+        amountOfOnes += newBit ? 1 : -1;
+    }
+
+    return Function<PARAMETERS>(std::move(result));
+}
 
 #include "Function.tcc"
 

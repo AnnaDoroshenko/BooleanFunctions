@@ -4,8 +4,9 @@
 #include "Function.h"
 
 
-template<std::size_t PARAMETERS>
-Function<PARAMETERS>::Function(std::bitset<ROWS(PARAMETERS)>&& values) : values(values) {
+template<unsigned int PARAMETERS>
+// Function<PARAMETERS>::Function(std::bitset<ROWS(PARAMETERS)> values) : values(values) {
+Function<PARAMETERS>::Function(std::vector<bool>&& values) : values(values) {
     std::cout << "--------------------------------------" << std::endl;
     std::cout << "Input: " << " ... was here ..." << std::endl;
     std::cout << "--------------------------------------" << std::endl;
@@ -46,17 +47,17 @@ Function<PARAMETERS>::Function(std::bitset<ROWS(PARAMETERS)>&& values) : values(
 //         }
 // }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 bool Function<PARAMETERS>::operator[](unsigned int index) const {
     return values[index];
 }
 
 
 // Linear function format is x(0),x(1),..x(n) [1,x(0),x(1),..x(n)]
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::LinearFunction::LinearFunction() {};
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::LinearFunction::LinearFunction(long long number) {
     unsigned int index = 0;
     while (number != 0) {
@@ -68,26 +69,28 @@ Function<PARAMETERS>::LinearFunction::LinearFunction(long long number) {
     }
 };
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 unsigned int Function<PARAMETERS>::LinearFunction::size() const {
     return indices.size();
 }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 unsigned int& Function<PARAMETERS>::LinearFunction::operator[](unsigned int index) {
     return indices[index];
 }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 const unsigned int& Function<PARAMETERS>::LinearFunction::operator[](unsigned int index) const {
     return indices[index];
 }
 
 
-template<std::size_t PARAMETERS>
-std::bitset<ROWS(PARAMETERS)> Function<PARAMETERS>::getLambdaFunction(unsigned int index) const {
+template<unsigned int PARAMETERS>
+std::vector<bool> Function<PARAMETERS>::getLambdaFunction(unsigned int index) const {
+/* std::bitset<ROWS(PARAMETERS)> Function<PARAMETERS>::getLambdaFunction(unsigned int index) const { */
     const auto linearFunction = LinearFunction(index);
-    std::bitset<ROWS(PARAMETERS)> lambdaFunction;
+    // std::bitset<ROWS(PARAMETERS)> lambdaFunction;
+    std::vector<bool> lambdaFunction(ROWS(PARAMETERS));
     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
         unsigned int currentResult = 0;
         unsigned int j = 0;
@@ -109,7 +112,7 @@ std::bitset<ROWS(PARAMETERS)> Function<PARAMETERS>::getLambdaFunction(unsigned i
 // (and Truth Table representation of linear function can be printed)
 // Be careful about input: [x(0), x(1), .. x(n), 1]
 // For example, f=x3 => 0...00100, so function expects 4
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 unsigned int Function<PARAMETERS>::calculateH(std::vector<unsigned int>& indices) const {
     unsigned int decForm = 0;
     for (unsigned int index : indices) {
@@ -137,7 +140,7 @@ unsigned int Function<PARAMETERS>::calculateH(std::vector<unsigned int>& indices
     return nonlinearity;
 }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 unsigned int Function<PARAMETERS>::calculateMinH(
         const std::array<std::pair<unsigned int, double>, PARAMETERS>&& sortedStats) const {
     std::array<unsigned int, PARAMETERS> sorted;
@@ -232,7 +235,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
 }
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 bool Function<PARAMETERS>::alreadyAdded(
         const std::vector<std::vector<unsigned int>>& selected, unsigned int test) const {
     for (auto& sel : selected) {
@@ -247,10 +250,11 @@ bool Function<PARAMETERS>::alreadyAdded(
 // and each of lambda functions. Then finding min distance.
 // Also the closest linear functions can be shown
 /* unsigned int Function::getMinDistance ( */
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 void Function<PARAMETERS>::calculateNonlinearity() const {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
-    std::vector<std::bitset<ROWS(PARAMETERS)>> arrayOfLambdaFunctions;
+    // std::vector<std::bitset<ROWS(PARAMETERS)>> arrayOfLambdaFunctions;
+    std::vector<std::vector<bool>> arrayOfLambdaFunctions(ROWS(PARAMETERS));
     for (unsigned int i = 2; i < LAMBDA_FUNCTIONS(PARAMETERS) + 2; i++) {
         const auto currentLambdaFunction = getLambdaFunction(i);
         const unsigned int currentNonlinearity = [&currentLambdaFunction, this](){
@@ -288,19 +292,19 @@ void Function<PARAMETERS>::calculateNonlinearity() const {
 
 // Format of a tuple is {number1, number2}
 // numbers differ by one bit (for example, {100, 101})
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::Tuple::Tuple() : number1(0), number2(0) {}
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::Tuple::Tuple(long long number1, long long number2) : number1(number1), number2(number2) {}
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 long long& Function<PARAMETERS>::Tuple::operator[](unsigned int index) {
     assert(index <= 1);
     return (index == 0 ? number1 : number2);
 }
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 const long long& Function<PARAMETERS>::Tuple::operator[](unsigned int index) const {
     assert(index <= 1);
     return (index == 0 ? number1 : number2);
@@ -310,7 +314,7 @@ const long long& Function<PARAMETERS>::Tuple::operator[](unsigned int index) con
 // Base number is a number, from which we get inverted number by one exact x.
 // Base number and inverted number form tuple.
 // For example, 000 - base number, 001 - number inverted by x2
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 long long Function<PARAMETERS>::getBaseNumber(unsigned int parameter, unsigned int index) const {
     const long long chunkSize = 1 << parameter;
     const long long chunkIndex = index / chunkSize;
@@ -319,7 +323,7 @@ long long Function<PARAMETERS>::getBaseNumber(unsigned int parameter, unsigned i
 }
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 typename Function<PARAMETERS>::Tuple Function<PARAMETERS>::getTuple(long long baseNumber, unsigned int bitToInvert) const {
     return Tuple(baseNumber, baseNumber ^ (1 << bitToInvert));
 }
@@ -353,7 +357,7 @@ typename Function<PARAMETERS>::Tuple Function<PARAMETERS>::getTuple(long long ba
 /* } */
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 std::array<std::pair<unsigned int, double>, PARAMETERS> Function<PARAMETERS>::getSortedStatistics() const {
     using Interest = std::pair<unsigned int, double>;
     std::array<Interest, PARAMETERS> statisticArray;
@@ -398,21 +402,21 @@ std::array<std::pair<unsigned int, double>, PARAMETERS> Function<PARAMETERS>::ge
 
 
 // method for finding linear function from lamda function
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::Brace::Brace(unsigned int arg, bool isInverted) : elem(arg, isInverted) {}
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 Function<PARAMETERS>::Brace::Brace() : Brace(0, false) {}
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 unsigned int Function<PARAMETERS>::Brace::index() const {
     return elem.first;
 }
 
 
-template<std::size_t PARAMETERS>
+template<unsigned int PARAMETERS>
 bool Function<PARAMETERS>::Brace::inverted() const {
     return elem.second;
 }
@@ -491,29 +495,30 @@ bool Function<PARAMETERS>::Brace::inverted() const {
 /* } */
 
 
-template<std::size_t PARAMETERS>
-Function<PARAMETERS> Function<PARAMETERS>::generateNonlinearFunc() {
-    std::bitset<ROWS(PARAMETERS)> result;
-    unsigned int amountOfOnes = 0;
-    for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
-        const bool newBit = std::rand() % 2 == 0;
-        result[i] = newBit;
-        if (newBit) amountOfOnes++;
-    }
-
-    // Check whether generated function is balanced.
-    // Need a correction if not balanced
-    const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
-    while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
-        unsigned int pos;
-        do { // Keep looking until have found a wrong bit
-            pos = std::rand() % ROWS(PARAMETERS);
-        } while (result[pos] == newBit);
-        result.flip(pos);
-        amountOfOnes += newBit ? 1 : -1;
-    }
-
-    return Function<PARAMETERS>(std::move(result));
-}
+// template<unsigned int PARAMETERS>
+/* Function<PARAMETERS> Function::generateNonlinearFunc(unsigned int PARAMETERS) { */
+/*     std::cout << "Stable " << std::endl; */
+/*     std::bitset<ROWS(PARAMETERS)> result; */
+/*     unsigned int amountOfOnes = 0; */
+/*     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) { */
+/*         const bool newBit = std::rand() % 2 == 0; */
+/*         result[i] = newBit; */
+/*         if (newBit) amountOfOnes++; */
+/*     } */
+/*  */
+/*     // Check whether generated function is balanced. */
+/*     // Need a correction if not balanced */
+/*     const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1); */
+/*     while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) { */
+/*         unsigned int pos; */
+/*         do { // Keep looking until have found a wrong bit */
+/*             pos = std::rand() % ROWS(PARAMETERS); */
+/*         } while (result[pos] == newBit); */
+/*         result.flip(pos); */
+/*         amountOfOnes += newBit ? 1 : -1; */
+/*     } */
+/*  */
+/*     return Function<PARAMETERS>(std::move(result)); */
+/* } */
 
 #endif

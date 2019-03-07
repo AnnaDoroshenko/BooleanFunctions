@@ -4,11 +4,10 @@
 #include <thread>
 #include "Function.h"
 
-
 int main() {
     std::srand(std::time(nullptr));
     const unsigned int N = 24;
-    const unsigned int STATISTIC_AMOUNT = 8;
+    const unsigned int STATISTIC_AMOUNT = 4;
 
     std::vector<unsigned int> nonlinearityStat;
     nonlinearityStat.reserve(STATISTIC_AMOUNT);
@@ -18,7 +17,7 @@ int main() {
     auto statisticsStep = [&mtx, &nonlinearityStat](unsigned int threadId) {
         for (unsigned int i = threadId; i < STATISTIC_AMOUNT; i += THREADS_COUNT) {
             std::cout << "---------------- " << i <<" ------------------" << std::endl;
-            const auto testFunction = Function<N>::generateNonlinearFunc();
+            const auto testFunction = generateNonlinearFunc<N>();
 
             // try {
             //     testFunction.calculateNonlinearity();
