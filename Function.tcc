@@ -160,7 +160,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
     selected.push_back({sorted[0]});
     unsigned int minH = calculateH(selected[0]);
     distances.push_back(minH);
-    unsigned int selectedSize = 1;
+    /* unsigned int selectedSize = 1; */
     /* std::cout << "k = 0, m = " << selectedSize; */
     /* for (std::vector<unsigned int> sel : selected) { */
     /*     std::cout << " l0 = "; */
@@ -173,7 +173,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
     for(unsigned int k = 1; k < sortedStats.size(); k++) {
         /* std::cout << "--------------------------------------" << std::endl; */
         /* std::cout << "k = " << k << std::endl; */
-        for (unsigned int h = 0, a = 0; h < (selectedSize - a); h++) {
+        for (unsigned int h = 0, a = 0; h < (selected.size() - a); h++) {
             /* std::cout << "--------------------------------------" << std::endl; */
             /* std::cout << "h = " << h << " a = " << a << std::endl; */
             /* unsigned int h1 = calculateH(selected[h]); */
@@ -207,7 +207,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
                 distances.push_back(calculateH(selected.back()));
-                selectedSize++;
+                // selectedSize++;
                 a++;
             }
             /* for (unsigned int i = 0; i < selected.size(); i++) { */
