@@ -5,7 +5,7 @@
 
 
 template<unsigned int PARAMETERS>
-Function<PARAMETERS>::Function(std::vector<bool>&& values) : values(values) {
+Function<PARAMETERS>::Function(std::vector<bool>&& values) : values(std::move(values)) {
     std::cout << "--------------------------------------" << std::endl;
     std::cout << "Input: " << " ... was here ..." << std::endl;
     std::cout << "--------------------------------------" << std::endl;
