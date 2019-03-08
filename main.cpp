@@ -24,8 +24,6 @@ int main() {
                 << std::chrono::duration_cast<std::chrono::seconds>(generationEnd - start).count()
                 << " seconds." << std::endl;
 
-            /* const auto elapsedGenerated = std::chrono::duration_cast<chrono::seconds>(std::chrono::steady_clock::now() - start) */
-
             // try {
             //     testFunction.calculateNonlinearity();
             // } catch(const std::invalid_argument& e) {
