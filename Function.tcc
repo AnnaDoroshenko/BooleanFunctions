@@ -281,7 +281,7 @@ void Function<PARAMETERS>::calculateNonlinearity() const {
            std::cout << minLambdaFunction[j];
        }
        std::cout << std::endl;
-    // TODO
+        // TODO
        getLinearFunction(minLambdaFunction);
     }
 }
@@ -419,103 +419,100 @@ bool Function<PARAMETERS>::Brace::inverted() const {
 }
 
 
-// TODO
-/* void Function::getLinearFunction(const std::bitset<ROWS()>& currentLamdaFunc) { */
-/*     using Argument = std::vector<Brace>; */
-/*     bool presenceTable[AMOUNT_OF_ROWS]; */
-/*     for (unsigned int i = 0; i < AMOUNT_OF_ROWS; i++) presenceTable[i] = false; */
-/*  */
-/*     for (unsigned int i = 0; i < AMOUNT_OF_ROWS; i++) { */
-/*         if (currentLamdaFunc[i] == 0) continue; */
-/*         #<{(| long long row = truthTable[i]; |)}># */
-/*         long long row = i; */
-/*         Argument currentArg; */
-/*         currentArg.reserve(AMOUNT_OF_PARAMETERS); */
-/*         for (int j = (AMOUNT_OF_PARAMETERS - 1); j >= 0; j--) { */
-/*             unsigned int bit = (row >> j) & 1; */
-/*             currentArg.push_back(Brace((AMOUNT_OF_PARAMETERS - 1 - j), (bit == 0))); */
-/*         } */
-/*  */
-/*         // processing of currentArg */
-/*         for (long long combination = 0; combination < AMOUNT_OF_ROWS; combination++) { */
-/*             std::vector<unsigned int> arguments; */
-/*             bool xorZero = false; */
-/*             for (unsigned int b = 0; b < AMOUNT_OF_PARAMETERS; b++) { */
-/*                 unsigned int currentBraceBit = (combination >> (AMOUNT_OF_PARAMETERS - 1 - b)) & 1; */
-/*                 if (currentBraceBit == 0) { */
-/*                     arguments.push_back(currentArg[b].index()); */
-/*                 } else { */
-/*                     // currentBraceBit == 1 => take second place inside brace */
-/*                     if (currentArg[b].inverted()) { // +1 */
-/*                         continue; // don't put this x, try next if any left */
-/*                     } else { // +0 */
-/*                         xorZero = true; */
-/*                         break; */
-/*                     } */
-/*                 } */
-/*             } */
-/*             if (xorZero) continue; */
-/*             long long currentIndex = 0; */
-/*             unsigned int size = arguments.size(); */
-/*             for (unsigned int k = 0; k < size ; k++) { */
-/*                 currentIndex += (1 << arguments[k]); */
-/*             } */
-/*             presenceTable[currentIndex] = !presenceTable[currentIndex]; */
-/*         } */
-/*     } */
-/*  */
-/*     // analize presenceTable and show the result */
-/*     bool notFirst = false; */
-/*     for (int index = AMOUNT_OF_ROWS - 1; index >= 0; index--) { */
-/*         if (presenceTable[index]) { */
-/*             if (notFirst) { */
-/*                 std::cout << " + "; */
-/*             } else { */
-/*                 notFirst = true; */
-/*             } */
-/*             if (index == 0) { */
-/*                 std::cout << "1"; */
-/*             } else { */
-/*                 unsigned int rightZeros = 0; */
-/*                 for (unsigned int param = 0; param < AMOUNT_OF_PARAMETERS; param++) { */
-/*                     if (((index >> param) & 1) == 1) { */
-/*                         break; */
-/*                     } */
-/*                     rightZeros++; */
-/*                 } */
-/*                 std::cout << "x" << rightZeros; */
-/*             } */
-/*         } */
-/*     } */
-/*     std::cout << std::endl; */
-/*     std::cout << "--------------------------------------" << std::endl; */
-/* } */
+template<unsigned int PARAMETERS>
+void Function<PARAMETERS>::getLinearFunction(const std::vector<bool>& currentLamdaFunc) const {
+    // bool presenceTable[ROWS(PARAMETERS)];
+    /* for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) presenceTable[i] = false; */
+    std::vector<bool> presenceTable(ROWS(PARAMETERS), false);
+
+    for (long long row = 0; row < ROWS(PARAMETERS); row++) {
+        if (!currentLamdaFunc[row]) continue;
+        std::array<Brace, PARAMETERS> currentArg;
+        // currentArg.reserve(PARAMETERS);
+        for (int j = (PARAMETERS - 1); j >= 0; j--) {
+            const bool bit = ((row >> j) & 1) == 0;
+            currentArg[PARAMETERS - j - 1] = (Brace((PARAMETERS - j - 1), bit));
+        }
+
+        // processing of currentArg
+        for (long long combination = 0; combination < ROWS(PARAMETERS); combination++) {
+            std::vector<unsigned int> arguments;
+            bool xorZero = false;
+            for (unsigned int b = 0; b < PARAMETERS; b++) {
+                const bool currentBraceBit = ((combination >> (PARAMETERS - 1 - b)) & 1) == 0;
+                if (!currentBraceBit) {
+                    arguments.push_back(currentArg[b].index());
+                } else {
+                    // currentBraceBit == 1 => take second place inside brace
+                    if (currentArg[b].inverted()) { // +1
+                        continue; // don't put this x, try next if any left
+                    } else { // +0
+                        xorZero = true;
+                        break;
+                    }
+                }
+            }
+            if (xorZero) continue;
+            long long currentIndex = 0;
+            for (unsigned int argument : arguments) {
+                currentIndex += (1 << argument);
+            }
+            presenceTable[currentIndex] = !presenceTable[currentIndex];
+        }
+    }
+
+    // analize presenceTable and show the result
+    bool notFirst = false;
+    for (int index = ROWS(PARAMETERS) - 1; index >= 0; index--) {
+        if (presenceTable[index]) {
+            if (notFirst) {
+                std::cout << " + ";
+            } else {
+                notFirst = true;
+            }
+            if (index == 0) {
+                std::cout << "1";
+            } else {
+                unsigned int rightZeros = 0;
+                for (unsigned int param = 0; param < PARAMETERS; param++) {
+                    if (((index >> param) & 1) == 1) {
+                        break;
+                    }
+                    rightZeros++;
+                }
+                std::cout << "x" << rightZeros;
+            }
+        }
+    }
+    std::cout << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+}
 
 
-// template<unsigned int PARAMETERS>
-/* Function<PARAMETERS> Function::generateNonlinearFunc(unsigned int PARAMETERS) { */
-/*     std::cout << "Stable " << std::endl; */
-/*     std::bitset<ROWS(PARAMETERS)> result; */
-/*     unsigned int amountOfOnes = 0; */
-/*     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) { */
-/*         const bool newBit = std::rand() % 2 == 0; */
-/*         result[i] = newBit; */
-/*         if (newBit) amountOfOnes++; */
-/*     } */
-/*  */
-/*     // Check whether generated function is balanced. */
-/*     // Need a correction if not balanced */
-/*     const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1); */
-/*     while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) { */
-/*         unsigned int pos; */
-/*         do { // Keep looking until have found a wrong bit */
-/*             pos = std::rand() % ROWS(PARAMETERS); */
-/*         } while (result[pos] == newBit); */
-/*         result.flip(pos); */
-/*         amountOfOnes += newBit ? 1 : -1; */
-/*     } */
-/*  */
-/*     return Function<PARAMETERS>(std::move(result)); */
-/* } */
+template<unsigned int PARAMETERS>
+Function<PARAMETERS> generateNonlinearFunc() {
+    std::vector<bool> result(ROWS(PARAMETERS));
+    unsigned int amountOfOnes = 0;
+    for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
+        const bool newBit = fastStdRand();
+        result[i] = newBit;
+        if (newBit) amountOfOnes++;
+    }
+
+    // Check whether generated function is balanced.
+    // Need a correction if not balanced
+    const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
+    while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
+        unsigned int pos = std::rand() % ROWS(PARAMETERS);
+        while (result[pos++] == newBit && pos < ROWS(PARAMETERS)); // very clever stuff
+        if (result[pos - 1] != newBit) { // if what we're looking for
+            result[pos - 1] = newBit;
+            amountOfOnes += newBit ? 1 : -1;
+        } // else we've stopped because pos == ROWS => bad luck => try everything again
+    }
+
+    return Function<PARAMETERS>(std::move(result));
+}
+
 
 #endif

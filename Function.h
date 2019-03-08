@@ -129,36 +129,12 @@ class Function {
             bool inverted() const;
     };
 
-    // TODO
     void getLinearFunction(const std::vector<bool>& currentLamdaFunc) const;
-    /* void getLinearFunction(const std::bitset<ROWS(PARAMETERS)>& currentLamdaFunc) const; */
 };
 
-
 template<unsigned int PARAMETERS>
-Function<PARAMETERS> generateNonlinearFunc() {
-    std::vector<bool> result(ROWS(PARAMETERS));
-    unsigned int amountOfOnes = 0;
-    for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
-        const bool newBit = fastStdRand();
-        result[i] = newBit;
-        if (newBit) amountOfOnes++;
-    }
+Function<PARAMETERS> generateNonlinearFunc();
 
-    // Check whether generated function is balanced.
-    // Need a correction if not balanced
-    const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
-    while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
-        unsigned int pos = std::rand() % ROWS(PARAMETERS);
-        while (result[pos++] == newBit && pos < ROWS(PARAMETERS)); // very clever stuff
-        if (result[pos - 1] != newBit) { // if what we're looking for
-            result[pos - 1] = newBit;
-            amountOfOnes += newBit ? 1 : -1;
-        } // else we've stopped because pos == ROWS => bad luck => try everything again
-    }
-
-    return Function<PARAMETERS>(std::move(result));
-}
 
 #include "Function.tcc"
 
