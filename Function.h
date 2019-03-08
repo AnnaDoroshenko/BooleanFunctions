@@ -40,7 +40,7 @@ bool fastStdRand() {
         index = 0;
         buffer = std::rand() % roof;
     }
-    const unsigned int result = (buffer & 1) == 1;
+    const bool result = (buffer & 1) == 1;
     index++;
     buffer >>= 1;
     return result;
@@ -136,13 +136,10 @@ class Function {
 
 
 template<unsigned int PARAMETERS>
-// std::bitset<ROWS(PARAMETERS)> generateNonlinearFunc() {
 Function<PARAMETERS> generateNonlinearFunc() {
     std::vector<bool> result(ROWS(PARAMETERS));
-    // std::bitset<ROWS(PARAMETERS)> result;
     unsigned int amountOfOnes = 0;
     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
-        /* const bool newBit = std::rand() % 2 == 0; */
         const bool newBit = fastStdRand();
         result[i] = newBit;
         if (newBit) amountOfOnes++;
@@ -152,11 +149,6 @@ Function<PARAMETERS> generateNonlinearFunc() {
     // Need a correction if not balanced
     const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
     while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
-        /* unsigned int pos; */
-        /* do { // Keep looking until have found a wrong bit */
-        /*     pos = std::rand() % ROWS(PARAMETERS); */
-        /* } while (result[pos] == newBit); */
-        // result[pos] = newBit;
         unsigned int pos = std::rand() % ROWS(PARAMETERS);
         while (result[pos++] == newBit && pos < ROWS(PARAMETERS)); // very clever stuff
         if (result[pos - 1] != newBit) { // if what we're looking for

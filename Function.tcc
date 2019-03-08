@@ -5,7 +5,6 @@
 
 
 template<unsigned int PARAMETERS>
-// Function<PARAMETERS>::Function(std::bitset<ROWS(PARAMETERS)> values) : values(values) {
 Function<PARAMETERS>::Function(std::vector<bool>&& values) : values(values) {
     std::cout << "--------------------------------------" << std::endl;
     std::cout << "Input: " << " ... was here ..." << std::endl;
@@ -87,9 +86,7 @@ const unsigned int& Function<PARAMETERS>::LinearFunction::operator[](unsigned in
 
 template<unsigned int PARAMETERS>
 std::vector<bool> Function<PARAMETERS>::getLambdaFunction(unsigned int index) const {
-/* std::bitset<ROWS(PARAMETERS)> Function<PARAMETERS>::getLambdaFunction(unsigned int index) const { */
     const auto linearFunction = LinearFunction(index);
-    // std::bitset<ROWS(PARAMETERS)> lambdaFunction;
     std::vector<bool> lambdaFunction(ROWS(PARAMETERS));
     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
         unsigned int currentResult = 0;
@@ -178,9 +175,9 @@ unsigned int Function<PARAMETERS>::calculateMinH(
             /* std::cout << "h = " << h << " a = " << a << std::endl; */
             /* unsigned int h1 = calculateH(selected[h]); */
             unsigned int h1 = distances.at(h);
-            if (h1 < minH) {
-                minH = h1;
-            }
+            /* if (h1 < minH) { */
+            /*     minH = h1; */
+            /* } */
             std::vector<unsigned int> sel = selected[h];
             sel.push_back(sorted[k]);
             /* for (unsigned int s: sel) { */
@@ -207,6 +204,7 @@ unsigned int Function<PARAMETERS>::calculateMinH(
             } else if (!alreadyAdded(selected, sorted[k])) {
                 selected.push_back({sorted[k]});
                 distances.push_back(calculateH(selected.back()));
+                passes++;
                 // selectedSize++;
                 a++;
             }
@@ -253,7 +251,6 @@ bool Function<PARAMETERS>::alreadyAdded(
 template<unsigned int PARAMETERS>
 void Function<PARAMETERS>::calculateNonlinearity() const {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
-    // std::vector<std::bitset<ROWS(PARAMETERS)>> arrayOfLambdaFunctions;
     std::vector<std::vector<bool>> arrayOfLambdaFunctions(ROWS(PARAMETERS));
     for (unsigned int i = 2; i < LAMBDA_FUNCTIONS(PARAMETERS) + 2; i++) {
         const auto currentLambdaFunction = getLambdaFunction(i);
