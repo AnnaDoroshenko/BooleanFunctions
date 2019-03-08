@@ -16,22 +16,35 @@
 #include <chrono>
 
 
-inline unsigned long fastRand() {
-    static unsigned long x = 123456789;
-    static unsigned long y = 362436069;
-    static unsigned long z = 521288629;
-    unsigned long t;
-    x ^= x << 16;
-    x ^= x >> 5;
-    x ^= x << 1;
+// inline unsigned long fastRand() {
+//     static unsigned long x = 123456789;
+//     static unsigned long y = 362436069;
+//     static unsigned long z = 521288629;
+//     unsigned long t;
+//     x ^= x << 16;
+//     x ^= x >> 5;
+//     x ^= x << 1;
+//
+//     t = x;
+//     x = y;
+//     y = z;
+//     z = t ^ x ^ y;
+//     return z;
+// }
 
-    t = x;
-    x = y;
-    y = z;
-    z = t ^ x ^ y;
-    return z;
+bool fastStdRand() {
+    static unsigned int buffer;
+    static const unsigned int roof = 1 << (sizeof(unsigned int) * 8 - 1);
+    static unsigned int index = roof;
+    if (index == roof) {
+        index = 0;
+        buffer = std::rand() % roof;
+    }
+    const unsigned int result = (buffer & 1) == 1;
+    index++;
+    buffer >>= 1;
+    return result;
 }
-
 
 inline constexpr long long ROWS(long long parameters) { return 1 << parameters; }
 inline constexpr long long LAMBDA_FUNCTIONS(long long parameters) { return (ROWS(parameters) << 1) - 2; }
@@ -130,7 +143,7 @@ Function<PARAMETERS> generateNonlinearFunc() {
     unsigned int amountOfOnes = 0;
     for (unsigned int i = 0; i < ROWS(PARAMETERS); i++) {
         /* const bool newBit = std::rand() % 2 == 0; */
-        const bool newBit = fastRand() % 2 == 0;
+        const bool newBit = fastStdRand();
         result[i] = newBit;
         if (newBit) amountOfOnes++;
     }
@@ -139,14 +152,17 @@ Function<PARAMETERS> generateNonlinearFunc() {
     // Need a correction if not balanced
     const bool newBit = amountOfOnes < (ROWS(PARAMETERS) >> 1);
     while (amountOfOnes != (ROWS(PARAMETERS) >> 1)) {
-        unsigned int pos;
-        do { // Keep looking until have found a wrong bit
-            // pos = std::rand() % ROWS(PARAMETERS);
-            pos = fastRand() % ROWS(PARAMETERS);
-        } while (result[pos] == newBit);
-        // result.flip(pos);
-        result[pos] = newBit;
-        amountOfOnes += newBit ? 1 : -1;
+        /* unsigned int pos; */
+        /* do { // Keep looking until have found a wrong bit */
+        /*     pos = std::rand() % ROWS(PARAMETERS); */
+        /* } while (result[pos] == newBit); */
+        // result[pos] = newBit;
+        unsigned int pos = std::rand() % ROWS(PARAMETERS);
+        while (result[pos++] == newBit && pos < ROWS(PARAMETERS)); // very clever stuff
+        if (result[pos - 1] != newBit) { // if what we're looking for
+            result[pos - 1] = newBit;
+            amountOfOnes += newBit ? 1 : -1;
+        } // else we've stopped because pos == ROWS => bad luck => try everything again
     }
 
     return Function<PARAMETERS>(std::move(result));
