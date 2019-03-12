@@ -46,7 +46,7 @@ bool fastStdRand() {
     return result;
 }
 
-inline constexpr long long ROWS(long long parameters) { return 1 << parameters; }
+inline constexpr long long ROWS(long long parameters) { return 1LL << parameters; }
 inline constexpr long long LAMBDA_FUNCTIONS(long long parameters) { return (ROWS(parameters) << 1) - 2; }
 
 template<unsigned int PARAMETERS>

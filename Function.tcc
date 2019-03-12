@@ -313,7 +313,7 @@ const long long& Function<PARAMETERS>::Tuple::operator[](unsigned int index) con
 // For example, 000 - base number, 001 - number inverted by x2
 template<unsigned int PARAMETERS>
 long long Function<PARAMETERS>::getBaseNumber(unsigned int parameter, unsigned int index) const {
-    const long long chunkSize = 1 << parameter;
+    const long long chunkSize = 1LL << parameter;
     const long long chunkIndex = index / chunkSize;
     const long long chunkShift = index % chunkSize;
     return chunkIndex * (chunkSize << 1) + chunkShift;
@@ -455,7 +455,7 @@ void Function<PARAMETERS>::getLinearFunction(const std::vector<bool>& currentLam
             if (xorZero) continue;
             long long currentIndex = 0;
             for (unsigned int argument : arguments) {
-                currentIndex += (1 << argument);
+                currentIndex += (1LL << argument);
             }
             presenceTable[currentIndex] = !presenceTable[currentIndex];
         }
