@@ -138,7 +138,7 @@ unsigned int Function<PARAMETERS>::calculateH(std::vector<unsigned int>& indices
 }
 
 template<unsigned int PARAMETERS>
-unsigned int Function<PARAMETERS>::calculateMinH(
+std::pair<unsigned int, unsigned int> Function<PARAMETERS>::calculateMinH(
         const std::array<std::pair<unsigned int, double>, PARAMETERS>&& sortedStats) const {
     std::array<unsigned int, PARAMETERS> sorted;
     std::vector<unsigned int> distances;
@@ -228,7 +228,8 @@ unsigned int Function<PARAMETERS>::calculateMinH(
     unsigned int realPasses = PARAMETERS + passes;
     std::cout << "passes = " << realPasses << std::endl;
 
-    return realPasses;
+    /* return std::make_pair<unsigned int, unsigned int>(realPasses, minH); */
+    return {realPasses, minH};
     /* return sorted; */
 }
 
@@ -249,7 +250,7 @@ bool Function<PARAMETERS>::alreadyAdded(
 // Also the closest linear functions can be shown
 /* unsigned int Function::getMinDistance ( */
 template<unsigned int PARAMETERS>
-void Function<PARAMETERS>::calculateNonlinearity() const {
+unsigned int Function<PARAMETERS>::calculateNonlinearity() const {
     unsigned int nonlinearity = std::numeric_limits<unsigned int>::max();
     std::vector<std::vector<bool>> arrayOfLambdaFunctions(ROWS(PARAMETERS));
     for (unsigned int i = 2; i < LAMBDA_FUNCTIONS(PARAMETERS) + 2; i++) {
@@ -277,13 +278,15 @@ void Function<PARAMETERS>::calculateNonlinearity() const {
     std::cout << "--------------------------------------" << std::endl;
 
     for (const auto& minLambdaFunction : arrayOfLambdaFunctions) {
-       for (unsigned int j = 0; j < minLambdaFunction.size(); j++) {
-           std::cout << minLambdaFunction[j];
-       }
-       std::cout << std::endl;
+       /* for (unsigned int j = 0; j < minLambdaFunction.size(); j++) { */
+       /*     std::cout << minLambdaFunction[j]; */
+       /* } */
+       /* std::cout << std::endl; */
         // TODO
        getLinearFunction(minLambdaFunction);
     }
+
+    return nonlinearity;
 }
 
 

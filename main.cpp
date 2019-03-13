@@ -6,15 +6,17 @@
 
 int main() {
     std::srand(std::time(nullptr));
-    const unsigned int N = 28;
+    const unsigned int N = 6;
     const unsigned int STATISTIC_AMOUNT = 98;
 
-    std::vector<unsigned int> nonlinearityStat;
-    nonlinearityStat.reserve(STATISTIC_AMOUNT);
+    std::vector<unsigned int> passesStat;
+    passesStat.reserve(STATISTIC_AMOUNT);
+    std::vector<float> percentStats;
+    percentStats.reserve(STATISTIC_AMOUNT);
 
-    const unsigned int THREADS_COUNT = 7;
+    const unsigned int THREADS_COUNT = 1;
     std::mutex mtx;
-    auto statisticsStep = [&mtx, &nonlinearityStat](unsigned int threadId) {
+    auto statisticsStep = [&mtx, &passesStat, &percentStats](unsigned int threadId) {
         for (unsigned int i = threadId; i < STATISTIC_AMOUNT; i += THREADS_COUNT) {
             std::cout << "---------------- " << i <<" ------------------" << std::endl;
             const auto start = std::chrono::steady_clock::now();
@@ -24,24 +26,29 @@ int main() {
                 << std::chrono::duration_cast<std::chrono::seconds>(generationEnd - start).count()
                 << " seconds." << std::endl;
 
-            // try {
-            //     testFunction.calculateNonlinearity();
-            // } catch(const std::invalid_argument& e) {
-            //     std::cerr << e.what() << std::endl;
-            // }
+            unsigned int realNL = 0;
+            try {
+                realNL = testFunction.calculateNonlinearity();
+            } catch(const std::invalid_argument& e) {
+                std::cerr << e.what() << std::endl;
+            }
 
             const auto sortedStats = testFunction.getSortedStatistics();
             const auto sortingEnd = std::chrono::steady_clock::now();
             std::cout << "######## " << i <<" has generated stats in "
                 << std::chrono::duration_cast<std::chrono::seconds>(sortingEnd - generationEnd).count()
                 << " seconds." << std::endl;
-            const unsigned int currN = testFunction.calculateMinH(std::move(sortedStats));
+            const auto [currN, currNonLin] = testFunction.calculateMinH(std::move(sortedStats));
             const auto minEnd = std::chrono::steady_clock::now();
             std::cout << "######## " << i <<" has calculated minH in "
                 << std::chrono::duration_cast<std::chrono::seconds>(minEnd - sortingEnd).count()
                 << " seconds." << std::endl;
+            const auto percent = static_cast<float>(currNonLin) / static_cast<float>(realNL);
+            std::cout << "$$$$$$$$$$$$$$$$$$Real = " << realNL << " and curr = " << currNonLin
+                << "(percent = " << percent << ")" << std::endl;
             mtx.lock();
-            nonlinearityStat.push_back(currN);
+            percentStats.push_back(percent);
+            passesStat.push_back(currN);
             mtx.unlock();
             std::cout << "######## " << i <<" took in total "
                 << std::chrono::duration_cast<std::chrono::seconds>(minEnd - start).count()
@@ -60,11 +67,19 @@ int main() {
 
     // Stats
     unsigned int sum = 0;
+    float sumPercent = 0;
+    float maxPercent = 0.0f;
     for (unsigned int k = 0; k < STATISTIC_AMOUNT; k++) {
-        sum += nonlinearityStat.at(k);
+        sum += passesStat.at(k);
+        const float percent = percentStats.at(k);
+        sumPercent  += percent;
+        if (percent > maxPercent) { maxPercent = percent; }
     }
     unsigned int mean = static_cast<unsigned int>(sum / STATISTIC_AMOUNT) + 1;
+    float meanPercent = static_cast<float>(sumPercent) / static_cast<float>(STATISTIC_AMOUNT);
     std::cout << "mean = " << mean << std::endl;
+    std::cout << "percent mean = " << meanPercent << std::endl;
+    std::cout << "max percent = " << maxPercent << std::endl;
 
     return 0;
 }

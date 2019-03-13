@@ -60,9 +60,9 @@ class Function {
     explicit Function(std::vector<bool>&& values);
     // explicit Function(std::bitset<ROWS(PARAMETERS)> values);
 
-    void calculateNonlinearity() const;
+    unsigned int calculateNonlinearity() const;
     unsigned int calculateH(std::vector<unsigned int>& indeces) const;
-    unsigned int calculateMinH(
+    std::pair<unsigned int, unsigned int> calculateMinH(
         const std::array<std::pair<unsigned int, double>, PARAMETERS>&& sortedStats) const;
 
     private:
