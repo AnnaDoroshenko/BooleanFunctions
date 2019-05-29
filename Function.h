@@ -84,9 +84,6 @@ class Function {
 
 
     std::vector<bool> getLambdaFunction(unsigned int index) const;
-    /* std::bitset<ROWS(PARAMETERS)> getLambdaFunction(unsigned int index) const; */
-    void getMinDistance() const;
-
 
     struct Tuple {
         private:
